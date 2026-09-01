@@ -1,0 +1,39 @@
+{
+  "image_filename": "AMPHAN_aqua_modis_2020-05-20_landfall.jpg",
+  "storm_name": "AMPHAN",
+  "imd_storm_id": "2020-013",
+  "image_datetime_utc": "2020-05-20T07:30:00Z",
+  "satellite": "Aqua",
+  "sensor": "MODIS",
+  "channel_band": "true_color",
+  "geographic_description": "Bay of Bengal/West Bengal coast - AMPHAN at landfall near Digha India",
+  "original_resolution_px": [
+    7789,
+    8103
+  ],
+  "working_resolution_px": [
+    1345,
+    1400
+  ],
+  "preprocessing": "bilateral filter, strong (d=13, sigmaColor=100, sigmaSpace=100)",
+  "enhancement": "CLAHE on L channel, clipLimit=2.0, tileGridSize=8x8",
+  "segmentation_method": "HSV thresholds, no-data corners excluded",
+  "full_cloud_shield_area_px": 1180946.5,
+  "full_cloud_shield_equivalent_diameter_px": 1226.2,
+  "dense_core_area_px": 962479.5,
+  "dense_core_equivalent_diameter_px": 1107.0,
+  "dense_core_circularity_0to1": 0.173,
+  "symmetry_score_0to1": 0.733,
+  "storm_center_px": [
+    777,
+    546
+  ],
+  "eye_detected": false,
+  "eye_details": null,
+  "storm_touches_frame_edge": true,
+  "pct_storm_boundary_at_frame_edge_or_nodata": 0.1,
+  "structure_assessment": "Fairly organized, rounded cloud mass but no clear eye -- consistent with a mature but structurally disrupted system (e.g. at/after landfall).",
+  "wind_estimate": null,
+  "wind_estimate_note": "Dropped for this image -- heuristic underestimated badly (45-65 km/h vs ~155-165 km/h actual) due to edge-cropping distorting circularity. Revisit with more calibration images.",
+  "scale_note": "All size/diameter/area in PIXELS at working resolution -- no geographic bounding box in source metadata to convert to km."
+}

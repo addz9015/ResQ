@@ -1,0 +1,120 @@
+{
+  "pipeline": "visible_true_color",
+  "steps": [
+    {
+      "step": 0,
+      "name": "Load & Inspect",
+      "output_image": "/mnt/user-data/outputs/image_processing/1/step_images/step0_original.jpg",
+      "findings": {
+        "storm_name": "AMPHAN",
+        "satellite": "Aqua",
+        "sensor": "MODIS",
+        "channel_band": "true_color",
+        "image_type": "satellite_visible",
+        "datetime_utc": "2020-05-20T07:30:00Z",
+        "original_resolution_px": [
+          7789,
+          8103
+        ],
+        "working_resolution_px": [
+          1345,
+          1400
+        ],
+        "geographic_description": "Bay of Bengal/West Bengal coast - AMPHAN at landfall near Digha India"
+      }
+    },
+    {
+      "step": 1,
+      "name": "Preprocessing",
+      "output_image": "/mnt/user-data/outputs/image_processing/1/step_images/step1_preprocessed.jpg",
+      "operations": [
+        "bilateral denoise (edge-preserving)",
+        "gray-world color normalization"
+      ],
+      "findings": {
+        "mean_channel_before_BGR": [
+          169.0,
+          171.1,
+          172.2
+        ],
+        "mean_channel_after_BGR": [
+          169.0,
+          171.1,
+          172.3
+        ]
+      }
+    },
+    {
+      "step": 2,
+      "name": "Enhancement",
+      "output_image": "/mnt/user-data/outputs/image_processing/1/step_images/step2_enhanced.jpg",
+      "operations": [
+        "CLAHE local contrast on L channel (clip=2.0, tiles=8x8)",
+        "unsharp mask sharpening"
+      ],
+      "findings": {
+        "contrast_std_before": 70.67,
+        "contrast_std_after": 73.12
+      }
+    },
+    {
+      "step": 3,
+      "name": "Segmentation",
+      "output_image": "/mnt/user-data/outputs/image_processing/1/step_images/step3_segmented.jpg",
+      "operations": [
+        "HSV thresholding (cloud/ocean/land)",
+        "morphological open+close",
+        "connected-component largest-blob selection"
+      ],
+      "findings": {
+        "cloud_cover_pct_of_frame": 63.1,
+        "ocean_pct_of_frame": 9.36,
+        "land_pct_of_frame": 10.49,
+        "largest_cloud_blob_area_px": 1045278,
+        "largest_cloud_blob_pct_of_frame": 55.51
+      }
+    },
+    {
+      "step": 4,
+      "name": "Feature Extraction",
+      "output_image": "/mnt/user-data/outputs/image_processing/1/step_images/step4_features.jpg",
+      "operations": [
+        "contour geometry (area, perimeter, circularity)",
+        "min enclosing circle",
+        "centroid",
+        "interior dark-spot eye search"
+      ],
+      "findings": {
+        "full_cloud_shield_area_px": 1107651.0,
+        "full_cloud_shield_equivalent_diameter_px": 1187.6,
+        "dense_core_area_px": 933926.0,
+        "dense_core_perimeter_px_smoothed": 8090.7,
+        "dense_core_equivalent_diameter_px": 1090.5,
+        "min_enclosing_circle_diameter_px": 1658.9,
+        "dense_core_circularity_0to1": 0.179,
+        "area_centroid_px": [
+          817,
+          658
+        ],
+        "storm_center_px_distance_transform": [
+          955,
+          316
+        ],
+        "eye_detected": false,
+        "eye_details": null,
+        "note_on_scale": "Metadata does not include a geographic bounding box / pixel-to-km scale, so measurements are reported in pixels (working resolution) rather than converted to km, to avoid false precision.",
+        "note_on_shape_metrics": "Orange outline = full cloud shield (includes thin outflow filaments); red outline = dense core after stripping thin filaments via morphological opening, used for circularity/eye search. Yellow diamond = distance-transform storm center (used for eye centrality check); green cross = plain area centroid (can be pulled off-center by asymmetric bands)."
+      }
+    },
+    {
+      "step": 5,
+      "name": "Classification / Interpretation",
+      "output_image": "/mnt/user-data/outputs/image_processing/1/step_images/step5_annotated_summary.jpg",
+      "findings": {
+        "structure_assessment": "Irregular / asymmetric cloud shape, no eye detected \u2014 consistent with a weaker, developing, or dissipating system.",
+        "circularity_0to1": 0.179,
+        "eye_detected_by_pipeline": false
+      }
+    }
+  ]
+}
