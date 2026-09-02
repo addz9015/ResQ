@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TC-Sentinel — Tropical Cyclone Monitoring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ── Design Tokens ── */
+:root {
+  --bg: #f2efe8;
+  --surface: #eae4d7;
+  --surface-2: #e0d9c8;
+  --border: #d6cdb8;
+  --text: #241f18;
+  --text-muted: #6f6656;
+  --accent: #b0472e;
+  --accent-strong: #8f3a24;
+  --on-accent: #fbf2ea;
+}
+[data-theme="dark"] {
+  --bg: #12130f;
+  --surface: #1b1c16;
+  --surface-2: #25261d;
+  --border: #35362a;
+  --text: #ece6d8;
+  --text-muted: #9a9382;
+  --accent: #cd7350;
+  --accent-strong: #e2916d;
+  --on-accent: #1b1109;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background .2s, color .2s;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font-family: inherit; cursor: pointer; }
+input, select { font-family: inherit; }
+
+/* ── Animations ── */
+@keyframes shineSweep {
+  0%   { transform: translateX(-130%) skewX(-16deg); }
+  55%  { transform: translateX(230%) skewX(-16deg); }
+  100% { transform: translateX(230%) skewX(-16deg); }
+}
+
+/* ── Shared Components ── */
+.tc-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.tc-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  padding: 8px 10px;
+  width: 100%;
+  outline: none;
+  transition: border-color .15s;
+}
+.tc-input:focus { border-color: var(--accent); }
+.tc-input::placeholder { color: var(--text-muted); }
+.tc-btn-primary {
+  position: relative;
+  overflow: hidden;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  border-radius: 2px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 11px 20px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background .15s;
+}
+.tc-btn-primary:hover { background: var(--accent-strong); }
+.tc-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.tc-shine {
+  position: absolute;
+  top: 0; left: 0; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+  animation: shineSweep 2.4s ease infinite;
+  pointer-events: none;
+}
+.tc-btn-ghost {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 11px 20px;
+  width: 100%;
+  transition: border-color .15s, color .15s;
+}
+.tc-btn-ghost:hover { border-color: var(--accent); color: var(--text); }
+
+/* ── App Shell ── */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+.main-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 252px;
+  min-height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 28px 0 20px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  flex-shrink: 0;
+}
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 22px 28px;
+}
+.sidebar-diamond {
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+.sidebar-logo-text h2 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+.sidebar-logo-text p {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 14px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 2px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+  transition: background .12s;
+}
+.nav-item:hover { background: var(--surface-2); }
+.nav-item.active { background: var(--surface-2); }
+.nav-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  width: 18px;
+  flex-shrink: 0;
+}
+.nav-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  transition: color .12s, transform .12s;
+}
+.sidebar-bottom {
+  padding: 14px 22px 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.theme-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  width: 100%;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.theme-btn:hover { border-color: var(--accent); }
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sidebar-user-info { display: flex; flex-direction: column; gap: 1px; }
+.sidebar-user-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+.sidebar-user-role {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.logout-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 16px;
+  transition: color .15s;
+}
+.logout-btn:hover { color: var(--accent); }
+
+/* ── Pages ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── Login / Register ── */
+.auth-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  min-height: 100vh;
+}
+.auth-inner {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.auth-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.auth-diamond {
+  width: 26px;
+  height: 26px;
+  background: var(--accent);
+  transform: rotate(45deg);
+}
+.auth-brand h1 {
+  font-family: 'Source Serif 4', serif;
+  font-weight: 600;
+  font-size: 24px;
+  color: var(--text);
+}
+.auth-brand p {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.auth-card h2 {
+  font-family: 'Source Serif 4', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-error {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  margin-top: 2px;
+}
+.server-error {
+  font-size: 13px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 2px;
+  padding: 8px 10px;
+}
+.auth-footer {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.btn-row {
+  display: flex;
+  gap: 10px;
+}
+.btn-row .tc-btn-ghost,
+.btn-row .tc-btn-primary { flex: 1; }
+
+/* ── Dashboard ── */
+.dash-wrap { padding: 44px 56px; }
+.dash-heading { margin-bottom: 34px; }
+.dash-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.dash-title {
+  font-family: 'Source Serif 4', serif;
+  font-weight: 600;
+  font-size: 32px;
+  color: var(--text);
+}
+.dash-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+.cyclone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+}
+.cyclone-card {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color .15s;
+}
+.cyclone-card:hover { border-color: var(--accent); }
+.cyclone-card-spotlight {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklch, var(--accent) 22%, transparent), transparent 75%);
+  opacity: 0;
+  transition: opacity .4s;
+  pointer-events: none;
+}
+.cyclone-card:hover .cyclone-card-spotlight { opacity: 0.6; }
+.cyclone-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+.cyclone-card-name {
+  font-family: 'Source Serif 4', serif;
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--text);
+}
+.cyclone-card-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.badge {
+  border-radius: 2px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.02em;
+  display: inline-block;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+/* Status badges */
+.badge-active {
+  background: #e8d6c8;
+  color: #8f3a24;
+  border: 1px solid #d6b89e;
+}
+.badge-dissipated {
+  background: #e0d9c8;
+  color: #6f6656;
+  border: 1px solid #d0c6ae;
+}
+.badge-post-landfall {
+  background: oklch(90% 0.05 85);
+  color: oklch(35% 0.09 85);
+  border: 1px solid oklch(70% 0.06 85);
+}
+[data-theme="dark"] .badge-active {
+  background: oklch(26% 0.05 20);
+  color: oklch(92% 0.09 20);
+  border: 1px solid oklch(42% 0.06 20);
+}
+[data-theme="dark"] .badge-dissipated {
+  background: oklch(26% 0.02 100);
+  color: oklch(85% 0.03 100);
+  border: 1px solid oklch(40% 0.02 100);
+}
+
+/* Alerts panel on dashboard */
+.alerts-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.alerts-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.alerts-panel-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.alert-row {
+  display: flex;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.alert-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+.alert-msg { font-size: 13px; color: var(--text); line-height: 1.4; }
+.alert-time {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ── Alerts Page ── */
+.alerts-wrap { padding: 44px 56px; }
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+.page-title {
+  font-family: 'Source Serif 4', serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--text);
+}
+.show-acked {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.alerts-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 640px;
+}
+.alert-item {
+  display: flex;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  padding: 14px 16px;
+}
+.alert-item.acked {
+  border-color: var(--border);
+  opacity: 0.7;
+}
+.alert-item-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+.alert-item.acked .alert-item-dot { background: var(--text-muted); }
+.alert-item-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.alert-item-msg { font-size: 14px; color: var(--text); line-height: 1.4; }
+.alert-item-time {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.ack-btn {
+  flex-shrink: 0;
+  align-self: center;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.ack-btn:hover { border-color: var(--accent); }
+
+/* ── Cyclone Detail ── */
+.detail-wrap { padding: 44px 56px; }
+.detail-back {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 16px;
+  background: none;
+  border: none;
+  padding: 0;
+  text-decoration: none;
+}
+.detail-back:hover { color: var(--text); }
+.detail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.detail-title {
+  font-family: 'Source Serif 4', serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--text);
+}
+.detail-subtitle {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+.detail-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.detail-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.panel-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.map-placeholder {
+  background: repeating-linear-gradient(135deg, var(--surface-2) 0 2px, var(--surface) 2px 14px);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+}
+.map-placeholder-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.chart-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 16px;
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chart-bars {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+.chart-bar {
+  flex: 1;
+  background: var(--accent);
+  opacity: 0.8;
+  border-radius: 2px 2px 0 0;
+  min-height: 4px;
+}
+.chart-no-data {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.generate-btn {
+  position: relative;
+  overflow: hidden;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  border-radius: 2px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 14px;
+  width: 100%;
+  cursor: pointer;
+  transition: background .15s;
+  margin-bottom: 24px;
+}
+.generate-btn:hover { background: var(--accent-strong); }
+.detail-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.info-card-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.info-card-value {
+  font-family: 'Source Serif 4', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+.info-card-unit {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.upload-zone {
+  border: 1px dashed var(--border);
+  border-radius: 3px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  margin-bottom: 24px;
+}
+.upload-arrow {
+  font-size: 22px;
+  color: var(--text-muted);
+}
+.upload-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── Create Cyclone ── */
+.create-wrap { padding: 44px 56px; }
+.create-title {
+  font-family: 'Source Serif 4', serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+.create-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 420px;
+}
+
+/* ── Misc ── */
+.empty-state {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface);
+  padding: 32px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ AUTH PAGES ═══ -->
+
+<!-- Login -->
+<div id="page-login" class="page active">
+  <div class="auth-wrap">
+    <div class="auth-inner">
+      <div class="auth-brand">
+        <div class="auth-diamond"></div>
+        <h1>TC-Sentinel</h1>
+        <p>Cyclone Operations · IMD</p>
+      </div>
+      <form class="auth-card" id="login-form" onsubmit="handleLogin(event)">
+        <h2>Sign in</h2>
+        <div id="login-error" class="server-error" style="display:none"></div>
+        <div class="field">
+          <label class="tc-label" for="login-email">Email</label>
+          <input class="tc-input" type="email" id="login-email" autocomplete="email" placeholder="admin@example.com" />
+        </div>
+        <div class="field">
+          <label class="tc-label" for="login-password">Password</label>
+          <input class="tc-input" type="password" id="login-password" autocomplete="current-password" placeholder="••••••••" />
+        </div>
+        <button type="submit" class="tc-btn-primary">
+          <span style="position:relative;z-index:2" id="login-btn-text">Sign in</span>
+          <span class="tc-shine"></span>
+        </button>
+      </form>
+      <p class="auth-footer">No account? <a href="#" onclick="showPage('register');return false;">Register</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- Register -->
+<div id="page-register" class="page">
+  <div class="auth-wrap">
+    <div class="auth-inner">
+      <div class="auth-brand">
+        <div class="auth-diamond"></div>
+        <h1>TC-Sentinel</h1>
+        <p>Cyclone Operations · IMD</p>
+      </div>
+      <form class="auth-card" id="register-form" onsubmit="handleRegister(event)">
+        <h2>Register</h2>
+        <div id="register-error" class="server-error" style="display:none"></div>
+        <div class="field">
+          <label class="tc-label" for="reg-name">Full name</label>
+          <input class="tc-input" type="text" id="reg-name" autocomplete="name" />
+          <div id="err-name" class="field-error" style="display:none"></div>
+        </div>
+        <div class="field">
+          <label class="tc-label" for="reg-email">Email</label>
+          <input class="tc-input" type="email" id="reg-email" autocomplete="email" />
+          <div id="err-email" class="field-error" style="display:none"></div>
+        </div>
+        <div class="field">
+          <label class="tc-label" for="reg-password">Password</label>
+          <input class="tc-input" type="password" id="reg-password" autocomplete="new-password" />
+          <div id="err-password" class="field-error" style="display:none"></div>
+        </div>
+        <button type="submit" class="tc-btn-primary">
+          <span style="position:relative;z-index:2">Create account</span>
+          <span class="tc-shine"></span>
+        </button>
+      </form>
+      <p class="auth-footer">Already have an account? <a href="#" onclick="showPage('login');return false;">Sign in</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ APP SHELL ═══ -->
+<div id="app-shell" class="app-shell" style="display:none">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar" onmousemove="sidebarProximity(event)" onmouseleave="sidebarReset()">
+    <div class="sidebar-logo">
+      <div class="sidebar-diamond"></div>
+      <div class="sidebar-logo-text">
+        <h2>RESQ</h2>
+        <p>Cyclone Operations · IMD</p>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <a class="nav-item active" id="nav-dashboard" href="#" onclick="navigate('dashboard');return false;">
+        <span class="nav-num">00</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a class="nav-item" id="nav-alerts" href="#" onclick="navigate('alerts');return false;">
+        <span class="nav-num">01</span>
+        <span class="nav-label">Alerts</span>
+      </a>
+      <a class="nav-item" id="nav-create" href="#" onclick="navigate('create');return false;">
+        <span class="nav-num">02</span>
+        <span class="nav-label">New Event</span>
+      </a>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">Switch to Dark</button>
+      <div class="sidebar-user">
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name" id="user-display-name">Admin</span>
+          <span class="sidebar-user-role" id="user-display-role">Admin</span>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()" title="Logout">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+
+    <!-- Dashboard -->
+    <div id="page-dashboard" class="page active">
+      <div class="dash-wrap">
+        <div class="dash-heading">
+          <p class="dash-label">North Indian Ocean · Live</p>
+          <h1 class="dash-title">Active Cyclone Events</h1>
+        </div>
+        <div class="dash-grid">
+          <section>
+            <div class="cyclone-grid" id="cyclone-grid"></div>
+          </section>
+          <section class="alerts-panel">
+            <div class="alerts-panel-header">
+              <span class="alerts-panel-title">Alerts</span>
+              <a href="#" onclick="navigate('alerts');return false;" style="font-size:12px">View all</a>
+            </div>
+            <div id="dashboard-alerts"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerts Page -->
+    <div id="page-alerts" class="page">
+      <div class="alerts-wrap">
+        <div class="page-header">
+          <h1 class="page-title">Alerts</h1>
+          <label class="show-acked">
+            <input type="checkbox" id="show-acked-cb" onchange="renderAlerts()" />
+            Show acknowledged
+          </label>
+        </div>
+        <ul class="alerts-list" id="alerts-list" aria-label="Alert list"></ul>
+      </div>
+    </div>
+
+    <!-- Cyclone Detail -->
+    <div id="page-detail" class="page">
+      <div class="detail-wrap">
+        <button class="detail-back" onclick="navigate('dashboard')">← Back</button>
+        <div class="detail-title-row">
+          <h1 class="detail-title" id="detail-title">—</h1>
+          <span class="badge" id="detail-status-badge"></span>
+        </div>
+        <p class="detail-subtitle" id="detail-subtitle">—</p>
+
+        <div class="detail-info-grid" id="detail-info-grid"></div>
+
+        <div class="detail-panels">
+          <div class="detail-panel">
+            <span class="panel-label">Track Forecast</span>
+            <div class="map-placeholder" id="detail-map">
+              <span class="map-placeholder-text" id="map-placeholder-text">Map Placeholder</span>
+              <span class="map-placeholder-text" id="map-placeholder-sub" style="font-size:10px;opacity:.6"></span>
+            </div>
+          </div>
+          <div class="detail-panel">
+            <span class="panel-label">Intensity Forecast (knots)</span>
+            <div class="chart-panel" id="detail-chart">
+              <div class="chart-no-data">No forecast generated yet.</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="generate-btn" onclick="generateForecast()">
+          <span style="position:relative;z-index:2">Generate Forecast</span>
+          <span class="tc-shine"></span>
+        </button>
+
+        <div class="detail-panel" style="margin-bottom:24px">
+          <span class="panel-label">Upload Satellite Image</span>
+          <div class="upload-zone">
+            <span class="upload-arrow">↑</span>
+            <span class="upload-text">Drop image or click to browse</span>
+            <span style="font-size:11px;color:var(--text-muted)">PNG, JPG, GeoTIFF</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Cyclone -->
+    <div id="page-create" class="page">
+      <div class="create-wrap">
+        <h1 class="create-title">New Cyclone Event</h1>
+        <form class="create-form" onsubmit="handleCreate(event)">
+          <div id="create-error" class="server-error" style="display:none"></div>
+          <div class="field">
+            <label class="tc-label" for="create-name">Event name</label>
+            <input class="tc-input" type="text" id="create-name" placeholder="e.g. Cyclone Amphan" />
+            <div id="err-create-name" class="field-error" style="display:none"></div>
+          </div>
+          <div class="field">
+            <label class="tc-label" for="create-basin">Basin</label>
+            <select class="tc-input" id="create-basin">
+              <option value="bay_of_bengal">Bay of Bengal</option>
+              <option value="arabian_sea">Arabian Sea</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="tc-label" for="create-year">Season year</label>
+            <input class="tc-input" type="number" id="create-year" value="2026" min="1900" max="2100" />
+            <div id="err-create-year" class="field-error" style="display:none"></div>
+          </div>
+          <div class="btn-row" style="padding-top:6px">
+            <button type="button" class="tc-btn-ghost" onclick="navigate('dashboard')">Cancel</button>
+            <button type="submit" class="tc-btn-primary">
+              <span style="position:relative;z-index:2" id="create-btn-text">Create event</span>
+              <span class="tc-shine"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /app-shell -->
+
+<script>
+// ── Mock Data ──────────────────────────────────────────────────────────────
+
+const CYCLONES = [
+  {
+    id: '1', name: 'Demo: Amphan', basin: 'bay_of_bengal', season_year: 2020,
+    status: 'active', category: 'Very Severe Cyclonic Storm',
+    wind_speed: 75, pressure: 952, lat: 21.5, lon: 88.3,
+  },
+  {
+    id: '2', name: 'Demo: Biparjoy', basin: 'arabian_sea', season_year: 2023,
+    status: 'active', category: 'Extremely Severe Cyclonic Storm',
+    wind_speed: 105, pressure: 944, lat: 23.1, lon: 65.2,
+  },
+  {
+    id: '3', name: 'Demo: Tauktae', basin: 'arabian_sea', season_year: 2021,
+    status: 'active', category: 'Extremely Severe Cyclonic Storm',
+    wind_speed: 95, pressure: 948, lat: 22.4, lon: 70.1,
+  },
+  {
+    id: '4', name: 'VSCS Alert Test', basin: 'bay_of_bengal', season_year: 2026,
+    status: 'active', category: 'Very Severe Cyclonic Storm',
+    wind_speed: 75, pressure: 958, lat: 15.6, lon: 85.4,
+  },
+  {
+    id: '5', name: 'EmptyForFmt', basin: 'arabian_sea', season_year: 2026,
+    status: 'active', category: 'Cyclonic Storm',
+    wind_speed: 45, pressure: 990, lat: 18.0, lon: 62.0,
+  },
+  {
+    id: '6', name: 'Cyclone Alpha', basin: 'arabian_sea', season_year: 2026,
+    status: 'dissipated', category: 'Depression',
+    wind_speed: 28, pressure: 1002, lat: 12.0, lon: 68.0,
+  },
+];
+
+const ALERTS = [
+  { id: 'a1', message: 'Cyclone VSCS Alert Test has intensified to Very Severe Cyclonic Storm (75.0 knots).', created_at: '2026-08-31T09:57:00Z', acknowledged: false },
+  { id: 'a2', message: 'Cyclone VSCS Alert Test has intensified to Very Severe Cyclonic Storm (75.0 knots).', created_at: '2026-08-30T09:14:00Z', acknowledged: false },
+  { id: 'a3', message: 'Cyclone VSCS Alert Test has intensified to Very Severe Cyclonic Storm (75.0 knots).', created_at: '2026-08-30T08:28:00Z', acknowledged: false },
+  { id: 'a4', message: 'Cyclone VSCS Alert Test has intensified to Very Severe Cyclonic Storm (75.0 knots).', created_at: '2026-08-30T08:27:00Z', acknowledged: false },
+  { id: 'a5', message: 'Cyclone VSCS Alert Test has intensified to Very Severe Cyclonic Storm (75.0 knots).', created_at: '2026-08-30T08:27:00Z', acknowledged: false },
+  { id: 'a6', message: 'Demo: Amphan has reached Cat-3 equivalent intensity.', created_at: '2026-08-28T14:30:00Z', acknowledged: true, acknowledged_at: '2026-08-28T15:00:00Z' },
+  { id: 'a7', message: 'Demo: Biparjoy track update — landfall probability 68% at Gujarat coast.', created_at: '2026-08-27T10:00:00Z', acknowledged: true, acknowledged_at: '2026-08-27T10:45:00Z' },
+];
+
+const BASIN_LABELS = { bay_of_bengal: 'Bay of Bengal', arabian_sea: 'Arabian Sea' };
+const STATUS_LABELS = { active: 'Active', dissipated: 'Dissipated', post_landfall: 'Post-landfall' };
+
+// ── State ──────────────────────────────────────────────────────────────────
+
+let currentUser = null;
+let currentTheme = localStorage.getItem('tc-theme') || 'light';
+let currentPage = 'dashboard';
+let currentCycloneId = null;
+let forecastGenerated = {};
+
+// ── Theme ──────────────────────────────────────────────────────────────────
+
+function applyTheme(t) {
+  currentTheme = t;
+  document.documentElement.dataset.theme = t;
+  localStorage.setItem('tc-theme', t);
+  const btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = t === 'dark' ? 'Switch to Light' : 'Switch to Dark';
+}
+
+function toggleTheme() {
+  applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+}
+
+// ── Auth ───────────────────────────────────────────────────────────────────
+
+function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+
+  if (!email.includes('@')) {
+    errEl.textContent = 'Please enter a valid email address.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (!pass) {
+    errEl.textContent = 'Password is required.';
+    errEl.style.display = 'block';
+    return;
+  }
+  // Accept any credentials — this is a demo
+  currentUser = { name: email.split('@')[0].replace(/[^a-z]/gi,' ').replace(/\b\w/g,c=>c.toUpperCase()).trim() || 'User', role: 'Admin' };
+  document.getElementById('user-display-name').textContent = currentUser.name;
+  document.getElementById('user-display-role').textContent = currentUser.role;
+  showShell();
+}
+
+function handleRegister(e) {
+  e.preventDefault();
+  let valid = true;
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass  = document.getElementById('reg-password').value;
+
+  const errName = document.getElementById('err-name');
+  const errEmail = document.getElementById('err-email');
+  const errPass  = document.getElementById('err-password');
+
+  [errName, errEmail, errPass].forEach(el => el.style.display='none');
+
+  if (!name) { errName.textContent='Name is required.'; errName.style.display='block'; valid=false; }
+  if (!email) { errEmail.textContent='Email is required.'; errEmail.style.display='block'; valid=false; }
+  if (pass.length < 8) { errPass.textContent='Password must be at least 8 characters.'; errPass.style.display='block'; valid=false; }
+  if (!valid) return;
+
+  currentUser = { name, role: 'Analyst' };
+  document.getElementById('user-display-name').textContent = name;
+  document.getElementById('user-display-role').textContent = 'Analyst';
+  showShell();
+}
+
+function handleLogout() {
+  currentUser = null;
+  document.getElementById('app-shell').style.display = 'none';
+  showPage('login');
+}
+
+// ── Routing ────────────────────────────────────────────────────────────────
+
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-' + pageId);
+  if (el) el.classList.add('active');
+}
+
+function showShell() {
+  document.getElementById('page-login').classList.remove('active');
+  document.getElementById('page-register').classList.remove('active');
+  document.getElementById('app-shell').style.display = 'flex';
+  navigate('dashboard');
+}
+
+function navigate(page, id) {
+  // Update nav items
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const navMap = { dashboard:'nav-dashboard', alerts:'nav-alerts', create:'nav-create', detail:'nav-dashboard' };
+  const navEl = document.getElementById(navMap[page] || 'nav-dashboard');
+  if (navEl) navEl.classList.add('active');
+
+  // Hide all main pages
+  ['dashboard','alerts','detail','create'].forEach(p => {
+    const el = document.getElementById('page-' + p);
+    if (el) el.classList.remove('active');
+  });
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+
+  currentPage = page;
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'alerts')    renderAlerts();
+  if (page === 'detail' && id) renderDetail(id);
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function fmtDate(iso, opts) {
+  return new Date(iso).toLocaleString(undefined, opts || { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function statusBadgeClass(status) {
+  if (status === 'active') return 'badge-active';
+  if (status === 'post_landfall') return 'badge-post-landfall';
+  return 'badge-dissipated';
+}
+
+// ── Dashboard ──────────────────────────────────────────────────────────────
+
+function renderDashboard() {
+  // Cyclone cards
+  const grid = document.getElementById('cyclone-grid');
+  const active = CYCLONES.filter(c => c.status === 'active');
+  grid.innerHTML = active.map(c => `
+    <div class="cyclone-card" onclick="navigate('detail','${c.id}')"
+         onmousemove="cardSpotlight(event,this)" onmouseleave="cardSpotlightReset(this)">
+      <div class="cyclone-card-spotlight"></div>
+      <div class="cyclone-card-top">
+        <span class="cyclone-card-name">${c.name}</span>
+        <span class="badge ${statusBadgeClass(c.status)}">${STATUS_LABELS[c.status]}</span>
+      </div>
+      <p class="cyclone-card-meta">${BASIN_LABELS[c.basin]} · ${c.season_year}</p>
+    </div>
+  `).join('');
+
+  // Alerts panel
+  const unacked = ALERTS.filter(a => !a.acknowledged).slice(0,5);
+  const panel = document.getElementById('dashboard-alerts');
+  if (unacked.length === 0) {
+    panel.innerHTML = '<p style="font-size:13px;color:var(--text-muted)">No unacknowledged alerts.</p>';
+    return;
+  }
+  panel.innerHTML = unacked.map(a => `
+    <div class="alert-row">
+      <span class="alert-dot"></span>
+      <div>
+        <p class="alert-msg">${a.message}</p>
+        <p class="alert-time">${fmtDate(a.created_at)}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function cardSpotlight(e, el) {
+  const rect = el.getBoundingClientRect();
+  el.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
+  el.style.setProperty('--my', (e.clientY - rect.top) + 'px');
+}
+function cardSpotlightReset(el) {
+  el.style.removeProperty('--mx');
+  el.style.removeProperty('--my');
+}
+
+// ── Alerts Page ────────────────────────────────────────────────────────────
+
+function renderAlerts() {
+  const showAll = document.getElementById('show-acked-cb')?.checked;
+  const list = document.getElementById('alerts-list');
+  const items = showAll ? ALERTS : ALERTS.filter(a => !a.acknowledged);
+  if (items.length === 0) {
+    list.innerHTML = `<li><div class="empty-state">${showAll ? 'No alerts yet.' : 'No unacknowledged alerts.'}</div></li>`;
+    return;
+  }
+  list.innerHTML = items.map(a => `
+    <li class="alert-item ${a.acknowledged ? 'acked' : ''}">
+      <span class="alert-item-dot"></span>
+      <div class="alert-item-body">
+        <p class="alert-item-msg">${a.message}</p>
+        <p class="alert-item-time">${fmtDate(a.created_at)}${a.acknowledged && a.acknowledged_at ? ' · Ack ' + fmtDate(a.acknowledged_at) : ''}</p>
+      </div>
+      ${!a.acknowledged ? `<button class="ack-btn" onclick="acknowledgeAlert('${a.id}')">Ack</button>` : ''}
+    </li>
+  `).join('');
+}
+
+function acknowledgeAlert(id) {
+  const alert = ALERTS.find(a => a.id === id);
+  if (alert) {
+    alert.acknowledged = true;
+    alert.acknowledged_at = new Date().toISOString();
+  }
+  renderAlerts();
+  renderDashboard();
+}
+
+// ── Cyclone Detail ─────────────────────────────────────────────────────────
+
+function renderDetail(id) {
+  currentCycloneId = id;
+  const c = CYCLONES.find(x => x.id === id);
+  if (!c) return navigate('dashboard');
+
+  document.getElementById('detail-title').textContent = c.name;
+  const badge = document.getElementById('detail-status-badge');
+  badge.textContent = STATUS_LABELS[c.status] || c.status;
+  badge.className = 'badge ' + statusBadgeClass(c.status);
+  document.getElementById('detail-subtitle').textContent =
+    `${BASIN_LABELS[c.basin]} · Season ${c.season_year}`;
+
+  // Info cards
+  document.getElementById('detail-info-grid').innerHTML = `
+    <div class="info-card">
+      <span class="info-card-label">Max Wind Speed</span>
+      <span class="info-card-value">${c.wind_speed}</span>
+      <span class="info-card-unit">knots</span>
+    </div>
+    <div class="info-card">
+      <span class="info-card-label">Min Pressure</span>
+      <span class="info-card-value">${c.pressure}</span>
+      <span class="info-card-unit">hPa</span>
+    </div>
+    <div class="info-card">
+      <span class="info-card-label">Category</span>
+      <span class="info-card-value" style="font-size:14px;line-height:1.3">${c.category}</span>
+    </div>
+  `;
+
+  // Map placeholder
+  document.getElementById('map-placeholder-text').textContent = 'MAP PLACEHOLDER';
+  document.getElementById('map-placeholder-sub').textContent =
+    `basin-centre fallback · ${BASIN_LABELS[c.basin]}`;
+
+  // Chart
+  renderChart(id);
+}
+
+function renderChart(id) {
+  const chart = document.getElementById('detail-chart');
+  if (!forecastGenerated[id]) {
+    chart.innerHTML = '<div class="chart-no-data">No forecast generated yet.</div>';
+    return;
+  }
+  const data = forecastGenerated[id];
+  const max = Math.max(...data);
+  chart.innerHTML = `
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:.06em">KNOTS</div>
+    <div class="chart-bars">
+      ${data.map(v => `<div class="chart-bar" style="height:${Math.round((v/max)*100)}%"></div>`).join('')}
+    </div>
+    <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted)">
+      <span>+0h</span><span>+24h</span><span>+48h</span><span>+72h</span>
+    </div>
+  `;
+}
+
+function generateForecast() {
+  const id = currentCycloneId;
+  const c = CYCLONES.find(x => x.id === id);
+  if (!c) return;
+  // Simulate intensification then decay
+  const base = c.wind_speed;
+  forecastGenerated[id] = [
+    base,
+    Math.round(base * 1.12),
+    Math.round(base * 1.08),
+    Math.round(base * 0.95),
+    Math.round(base * 0.82),
+    Math.round(base * 0.68),
+    Math.round(base * 0.54),
+    Math.round(base * 0.42),
+  ];
+  renderChart(id);
+}
+
+// ── Create Cyclone ─────────────────────────────────────────────────────────
+
+function handleCreate(e) {
+  e.preventDefault();
+  const name = document.getElementById('create-name').value.trim();
+  const year = parseInt(document.getElementById('create-year').value);
+  const errName = document.getElementById('err-create-name');
+  const errYear = document.getElementById('err-create-year');
+  errName.style.display = 'none';
+  errYear.style.display = 'none';
+
+  let valid = true;
+  if (!name) { errName.textContent='Name is required.'; errName.style.display='block'; valid=false; }
+  if (isNaN(year) || year < 1900 || year > 2100) { errYear.textContent='Year must be 1900–2100.'; errYear.style.display='block'; valid=false; }
+  if (!valid) return;
+
+  const basin = document.getElementById('create-basin').value;
+  const newCyclone = {
+    id: String(Date.now()),
+    name, basin, season_year: year,
+    status: 'active', category: 'Depression',
+    wind_speed: 30, pressure: 1000, lat: 15.0, lon: 75.0,
+  };
+  CYCLONES.unshift(newCyclone);
+  navigate('detail', newCyclone.id);
+}
+
+// ── Sidebar Proximity Hover ─────────────────────────────────────────────────
+
+function sidebarProximity(e) {
+  const items = document.querySelectorAll('.nav-item');
+  items.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const cy = rect.top + rect.height / 2;
+    const dist = Math.abs(e.clientY - cy);
+    const radius = 90;
+    const t = Math.max(0, 1 - dist / radius);
+    const smooth = t * t * (3 - 2 * t);
+    el.querySelector('.nav-label').style.color =
+      smooth > 0.05 ? `color-mix(in oklch, var(--accent) ${Math.round(smooth*100)}%, var(--text))` : '';
+    el.querySelector('.nav-label').style.transform =
+      `translateX(${(smooth * 20).toFixed(1)}px)`;
+  });
+}
+
+function sidebarReset() {
+  document.querySelectorAll('.nav-item .nav-label').forEach(el => {
+    el.style.color = '';
+    el.style.transform = '';
+  });
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+
+applyTheme(currentTheme);
+</script>
+</body>
+</html>
