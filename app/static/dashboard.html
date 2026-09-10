@@ -1391,7 +1391,18 @@ input:focus-visible,
     <div id="page-warnings" class="page">
       <div class="predictions-wrap">
         <div class="page-header"><h1 class="page-title">Official Warnings</h1></div>
-        <p class="fc-plain" style="margin:-6px 0 18px">Paste an official IMD cyclone bulletin below. ResQ will explain what it says in plain language and show what our models add. ResQ does not issue warnings.</p>
+        <p class="fc-plain" style="margin:-6px 0 18px">Upload an official IMD cyclone bulletin or RSMC report, or paste the text below. ResQ will explain what it says in plain language and show what our models add. ResQ does not issue warnings.</p>
+
+        <div class="upload-zone" id="w-drop" role="button" tabindex="0" aria-label="Upload a bulletin or report">
+          <span class="upload-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M6 10l6-6 6 6"/><path d="M4 20h16"/></svg>
+          </span>
+          <span class="upload-text">Upload an IMD bulletin or RSMC report (PDF), or paste the text below.</span>
+          <span class="upload-formats">.pdf or .txt · up to 20 MB · processed in memory, not stored</span>
+          <span class="upload-filename" id="w-filename"></span>
+          <input type="file" id="w-file" accept=".pdf,.txt,application/pdf,text/plain" hidden />
+        </div>
+
         <label class="tc-label" for="w-text">Bulletin text</label>
         <textarea class="tc-input" id="w-text" rows="9" placeholder="Paste the full text of an IMD Tropical Cyclone / National Weather bulletin here…"></textarea>
         <button type="button" class="tc-btn-primary" id="w-run" style="margin-top:12px">Explain this bulletin</button>
@@ -2150,6 +2161,109 @@ const W_FIELD_LABELS = {
 function renderWarnings() {
   const btn = document.getElementById('w-run');
   if (btn && !btn._wired) { btn.onclick = runExplainBulletin; btn._wired = true; }
+
+  const drop = document.getElementById('w-drop');
+  const fileInput = document.getElementById('w-file');
+  if (drop && fileInput && !drop._wired) {
+    drop._wired = true;
+    const pick = () => fileInput.click();
+    drop.addEventListener('click', pick);
+    drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files[0]) uploadBulletinFile(fileInput.files[0]);
+    });
+    ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => {
+      e.preventDefault(); e.stopPropagation(); drop.classList.add('dragover');
+    }));
+    ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => {
+      e.preventDefault(); e.stopPropagation(); drop.classList.remove('dragover');
+    }));
+    drop.addEventListener('drop', e => {
+      const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) uploadBulletinFile(f);
+    });
+  }
+}
+
+// keep the uploaded doc around so a multi-storm "Parse" button can re-call
+let W_UPLOAD = null;   // { file, docType, storms }
+
+async function uploadBulletinFile(file, stormName) {
+  const out = document.getElementById('w-output');
+  const fnEl = document.getElementById('w-filename');
+  if (fnEl) fnEl.textContent = file.name;
+  out.innerHTML = `<p class="dash-empty-text">Reading ${escapeHtml(file.name)}…</p>`;
+
+  const fd = new FormData();
+  fd.append('file', file, file.name);
+  if (stormName) fd.append('storm', stormName);
+
+  let res, r;
+  try {
+    res = await fetch('/api/bulletin/upload', { method: 'POST', body: fd });
+    r = await res.json();
+  } catch (e) {
+    out.innerHTML = '<p class="dash-empty-text">The ResQ backend is not reachable. Start it with <code>python app/run.py</code>.</p>';
+    return;
+  }
+  if (!res.ok) {
+    out.innerHTML = `<p class="dash-empty-text">Upload rejected: ${escapeHtml(r.detail || res.statusText)}. You can still paste the text below.</p>`;
+    return;
+  }
+
+  W_UPLOAD = { file, docType: r.doc_type, storms: r.storms_found || [] };
+  const st = r.extraction_stats || {};
+  const typeLabel = {
+    SINGLE_BULLETIN: 'Single cyclone bulletin',
+    MULTI_STORM_REPORT: 'Multi-storm RSMC report',
+    NOT_A_BULLETIN: 'Not a cyclone bulletin',
+    NO_TEXT_LAYER: 'No readable text layer',
+  }[r.doc_type] || r.doc_type;
+
+  let html = `<div class="rq-panel">
+    <span class="panel-label">What was detected</span>
+    <div style="overflow-x:auto"><table class="rq-table"><tbody>
+      <tr><td style="color:var(--text-muted)">File</td><td>${escapeHtml(st.filename || file.name)}</td></tr>
+      <tr><td style="color:var(--text-muted)">Source</td><td>uploaded by user</td></tr>
+      <tr><td style="color:var(--text-muted)">Document type</td><td>${escapeHtml(typeLabel)}</td></tr>
+      <tr><td style="color:var(--text-muted)">Pages</td><td>${st.page_count != null ? st.page_count : '—'}</td></tr>
+      <tr><td style="color:var(--text-muted)">Characters extracted</td><td>${st.chars_extracted != null ? st.chars_extracted.toLocaleString() : '—'}</td></tr>
+    </tbody></table></div>
+    ${r.message ? `<p class="rq-cite">${escapeHtml(r.message)}</p>` : ''}
+    <p class="rq-cite">Source: uploaded by user — ResQ has not verified this file against IMD.</p>
+  </div>`;
+
+  if (r.doc_type === 'NO_TEXT_LAYER' || r.doc_type === 'NOT_A_BULLETIN') {
+    html += `<p class="dash-empty-text">Nothing was parsed. Paste the bulletin text into the box below and press “Explain this bulletin”.</p>`;
+    out.innerHTML = html;
+    return;
+  }
+
+  if (r.doc_type === 'MULTI_STORM_REPORT' && !r.parsed) {
+    const rows = (r.storms_found || []).map(s => `<tr>
+      <td>${escapeHtml(s.name)}</td>
+      <td style="white-space:nowrap">pages ${s.first_page}${s.last_page !== s.first_page ? '–' + s.last_page : ''}</td>
+      <td><button type="button" class="tc-btn-ghost" onclick="parseUploadedStorm('${escapeHtml(s.name).replace(/'/g, "\\'")}')">Parse this section</button></td>
+    </tr>`).join('');
+    html += `<div class="rq-panel"><span class="panel-label">Storms found in this report</span>
+      <div style="overflow-x:auto"><table class="rq-table">
+      <thead><tr><th>storm</th><th>appears on</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="3">No storm names could be read from this report.</td></tr>'}</tbody></table></div>
+      <p class="rq-cite">The report is not merged into one bulletin. Pick one storm to parse just that section.</p></div>`;
+    out.innerHTML = html;
+    return;
+  }
+
+  // SINGLE_BULLETIN, or a chosen MULTI_STORM section — render the standard view
+  const srcNote = r.selected_storm
+    ? `uploaded by user · section for ${r.selected_storm.name} (pages ${r.selected_storm.first_page}–${r.selected_storm.last_page})`
+    : 'uploaded by user';
+  html += renderBulletinResult(r.parsed, r.explanation.lines, r.overlay, r.checklist_prefill, srcNote);
+  out.innerHTML = html;
+}
+
+function parseUploadedStorm(name) {
+  if (W_UPLOAD && W_UPLOAD.file) uploadBulletinFile(W_UPLOAD.file, name);
 }
 
 async function runExplainBulletin() {
@@ -2167,8 +2281,10 @@ async function runExplainBulletin() {
     out.innerHTML = '<p class="dash-empty-text">The ResQ backend is not reachable. Start it with <code>python app/run.py</code>.</p>';
     return;
   }
-  const p = r.parsed, ex = r.explanation.lines, ov = r.resq_overlay;
+  out.innerHTML = renderBulletinResult(r.parsed, r.explanation.lines, r.resq_overlay, r.checklist_prefill, r.parsed.source || 'text pasted by user');
+}
 
+function renderBulletinResult(p, ex, ov, checklistPrefill, sourceLabel) {
   const raw = {
     issued_at: p.issued_at_raw, system_name: p.system_name_raw,
     current_position: p.current_position_raw,
@@ -2215,8 +2331,8 @@ async function runExplainBulletin() {
   } else {
     overlayHtml += `<p class="dash-empty-text">No ResQ overlay — ${escapeHtml((ov && ov.reason) || 'not enough was parsed from the text')}.</p>`;
   }
-  if (r.checklist_prefill && r.checklist_prefill.intensity) {
-    const pf = r.checklist_prefill;
+  if (checklistPrefill && checklistPrefill.intensity) {
+    const pf = checklistPrefill;
     const hrs = pf.hours_to_landfall != null ? `, ${pf.hours_to_landfall}h out` : '';
     const arg = `'${pf.intensity}',${pf.hours_to_landfall != null ? pf.hours_to_landfall : 'null'}`;
     overlayHtml += `<button type="button" class="tc-btn-primary" style="margin-top:12px"
@@ -2224,8 +2340,8 @@ async function runExplainBulletin() {
   }
   overlayHtml += `<p class="fc-disc">ResQ model estimate — not an official warning.</p></div>`;
 
-  out.innerHTML = `
-    <p class="dash-metric-sub">Source: ${escapeHtml(p.source || 'text pasted by user')}${p.issued_at ? ' · issued ' + escapeHtml(p.issued_at) : ''}</p>
+  return `
+    <p class="dash-metric-sub">Source: ${escapeHtml(sourceLabel || 'text pasted by user')}${p.issued_at ? ' · issued ' + escapeHtml(p.issued_at) : ''}</p>
     <div class="rq-panel"><span class="panel-label">What the bulletin says</span>
       <div style="overflow-x:auto"><table class="rq-table">
       <thead><tr><th>field</th><th>as written in the bulletin</th><th>plain English</th></tr></thead>

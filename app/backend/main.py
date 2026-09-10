@@ -19,8 +19,9 @@ from __future__ import annotations
 import json
 import pathlib
 import pickle
+import re
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -224,15 +225,11 @@ def _hours_to_landfall(issued_at_iso, time_raw):
     return int(round(delta_h))
 
 
-@app.post("/api/bulletin/explain")
-def bulletin_explain(b: BulletinText):
-    import sys as _sys
-    _sys.path.insert(0, str(HERE.parents[1]))
-    from src.imd_bulletin import parse_text, explain
-
-    parsed = parse_text(b.text)
-    plain = explain(parsed)
-
+def _resq_overlay(parsed: dict) -> dict:
+    """Seed the ResQ forecast engine from a parsed bulletin's position and
+    intensity. Returns the overlay dict used by both the paste and the upload
+    endpoints. Never fabricates a bulletin field — it only reads what
+    parse_text() already extracted."""
     overlay = {"disclaimer": DISCLAIMER, "available": False,
                "reason": "no usable position/intensity in the pasted text"}
     pos = parsed.get("current_position")
@@ -278,28 +275,141 @@ def bulletin_explain(b: BulletinText):
         except Exception as e:                        # noqa: BLE001
             overlay = {"disclaimer": DISCLAIMER, "available": False,
                        "reason": f"forecast engine error: {e!r}"}
+    return overlay
 
-    # prefill for the Checklist tab
-    checklist_link = None
-    if ci.get("category"):
-        short = {"Depression": "D", "Deep Depression": "DD", "Cyclonic Storm": "CS",
-                 "Severe Cyclonic Storm": "SCS", "Very Severe Cyclonic Storm": "VSCS",
-                 "Extremely Severe Cyclonic Storm": "ESCS",
-                 "Super Cyclonic Storm": "ESCS"}.get(ci["category"])
-        lf_raw = (parsed.get("landfall_estimate") or {}).get("time_raw")
-        checklist_link = {
-            "intensity": short,
-            "landfall_time_raw": lf_raw,
-            "hours_to_landfall": _hours_to_landfall(parsed.get("issued_at"), lf_raw),
-        }
 
+def _checklist_prefill(parsed: dict) -> dict | None:
+    """Prefill for the Checklist tab — only from fields parse_text() extracted."""
+    ci = parsed.get("current_intensity") or {}
+    if not ci.get("category"):
+        return None
+    short = {"Depression": "D", "Deep Depression": "DD", "Cyclonic Storm": "CS",
+             "Severe Cyclonic Storm": "SCS", "Very Severe Cyclonic Storm": "VSCS",
+             "Extremely Severe Cyclonic Storm": "ESCS",
+             "Super Cyclonic Storm": "ESCS"}.get(ci["category"])
+    lf_raw = (parsed.get("landfall_estimate") or {}).get("time_raw")
+    return {
+        "intensity": short,
+        "landfall_time_raw": lf_raw,
+        "hours_to_landfall": _hours_to_landfall(parsed.get("issued_at"), lf_raw),
+    }
+
+
+@app.post("/api/bulletin/explain")
+def bulletin_explain(b: BulletinText):
+    import sys as _sys
+    _sys.path.insert(0, str(HERE.parents[1]))
+    from src.imd_bulletin import parse_text, explain
+
+    parsed = parse_text(b.text)
     return {
         "parsed": parsed,
-        "explanation": plain,
-        "resq_overlay": overlay,
-        "checklist_prefill": checklist_link,
+        "explanation": explain(parsed),
+        "resq_overlay": _resq_overlay(parsed),
+        "checklist_prefill": _checklist_prefill(parsed),
         "disclaimer_on_overlay_only": True,
     }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Official Warnings — upload a bulletin PDF / .txt or an RSMC report.
+#  The document is classified BEFORE anything is parsed. A multi-storm report is
+#  never merged into one bulletin: its storms are listed with page ranges and
+#  the user picks the section to parse. parse_text() / explain() are reused
+#  unchanged; every "never infer a colour / district / landfall" rule still holds.
+#  The upload is processed in memory and discarded — never written to disk.
+# ─────────────────────────────────────────────────────────────────────────────
+_UPLOAD_MSG = {
+    "NO_TEXT_LAYER": "This PDF has no readable text layer — it looks scanned or "
+                     "image-only. ResQ does not run OCR. Please copy the bulletin "
+                     "text and paste it into the box below.",
+    "NOT_A_BULLETIN": "Text was extracted, but it contains no cyclone-bulletin "
+                      "markers. Nothing was parsed. If this really is a bulletin, "
+                      "paste its text into the box below.",
+    "MULTI_STORM_REPORT": "This looks like a multi-storm RSMC report, not a single "
+                          "operational bulletin. Pick one storm below to parse just "
+                          "that section — the report is not merged into one bulletin.",
+    "SINGLE_BULLETIN": "Detected a single cyclone bulletin.",
+}
+
+
+@app.post("/api/bulletin/upload")
+async def bulletin_upload(file: UploadFile = File(...),
+                          storm: str | None = Form(None)):
+    import sys as _sys
+    _sys.path.insert(0, str(HERE.parents[1]))
+    from src.document_ingest import DocumentError, extract_document
+    from src.imd_bulletin import (detect_doc_type, explain, parse_text,
+                                  section_text)
+
+    data = await file.read()
+    try:
+        doc = extract_document(file.filename or "", data)
+    except DocumentError as e:
+        raise HTTPException(400, f"{file.filename or 'file'}: {e}")
+    finally:
+        del data
+
+    det = detect_doc_type(doc["text"], doc["page_count"],
+                          doc["chars_extracted"], doc["per_page_text"])
+    doc_type = det["doc_type"]
+    storms_found = det["storms_found"]
+
+    stats = {
+        "filename": file.filename,
+        "source": "uploaded by user",
+        "doc_type": doc_type,
+        "page_count": doc["page_count"],
+        "chars_extracted": doc["chars_extracted"],
+        "per_page_chars": [len(re.sub(r"\s", "", t)) for t in doc["per_page_text"]],
+        "detection_reason": det["reason"],
+    }
+    resp = {
+        "doc_type": doc_type,
+        "storms_found": storms_found,
+        "parsed": None,
+        "explanation": None,
+        "overlay": None,
+        "checklist_prefill": None,
+        "disclaimer": DISCLAIMER,
+        "message": _UPLOAD_MSG.get(doc_type, ""),
+        "extraction_stats": stats,
+    }
+
+    if doc_type in ("NO_TEXT_LAYER", "NOT_A_BULLETIN"):
+        return resp
+
+    if doc_type == "MULTI_STORM_REPORT":
+        if not storm:
+            return resp
+        chosen = next((s for s in storms_found
+                       if s["name"].lower() == storm.strip().lower()), None)
+        if chosen is None:
+            raise HTTPException(
+                404, f"'{storm}' is not one of the storms found in this report")
+        sect = section_text(doc["per_page_text"],
+                            chosen["first_page"], chosen["last_page"])
+        parsed = parse_text(sect)
+        resp.update({
+            "parsed": parsed,
+            "explanation": explain(parsed),
+            "overlay": _resq_overlay(parsed),
+            "checklist_prefill": _checklist_prefill(parsed),
+            "message": f"Parsed the section for {chosen['name']} "
+                       f"(pages {chosen['first_page']}–{chosen['last_page']}).",
+        })
+        resp["selected_storm"] = chosen
+        return resp
+
+    # SINGLE_BULLETIN — same shape as POST /api/bulletin/explain
+    parsed = parse_text(doc["text"])
+    resp.update({
+        "parsed": parsed,
+        "explanation": explain(parsed),
+        "overlay": _resq_overlay(parsed),
+        "checklist_prefill": _checklist_prefill(parsed),
+    })
+    return resp
 
 
 # ─────────────────────────────────────────────────────────────────────────────

@@ -339,6 +339,170 @@ def _parse_landfall(text):
             re.sub(r"\s+", " ", m.group(0)).strip())
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  DOCUMENT-TYPE DETECTION  —  classify extracted text BEFORE parsing.
+#
+#  Deterministic only: markers, counts, regex. NO LLM. A document is parsed as
+#  a single bulletin ONLY when it is classified SINGLE_BULLETIN.
+#
+#    SINGLE_BULLETIN   one storm, one issue time — parse fully
+#    MULTI_STORM_REPORT an RSMC annual / verification report over several
+#                       systems — list the storms + page ranges, parse nothing
+#                       until the user picks one section
+#    NOT_A_BULLETIN    text extracted, but no cyclone-bulletin markers — parse
+#                       nothing
+#    NO_TEXT_LAYER     scanned / image-only PDF, little or no text — parse
+#                       nothing, tell the user to paste the text
+# ═══════════════════════════════════════════════════════════════════════════
+
+DOC_TYPES = ("SINGLE_BULLETIN", "MULTI_STORM_REPORT",
+             "NOT_A_BULLETIN", "NO_TEXT_LAYER")
+
+_MULTI_STORM_PAGE_THRESHOLD = 8         # operational bulletins are 1–4 pages
+
+# strong markers: any one is enough to say "this is a cyclone bulletin/report"
+_BULLETIN_MARKERS = [
+    re.compile(p, re.I) for p in (
+        r"\bcyclonic storm\b", r"\bdeep depression\b", r"\bsuper cyclone\b",
+        r"\btropical cyclone\b", r"\brsmc\b", r"\bbulletin no\.?\b",
+        r"\bindia meteorological department\b",
+        r"\blandfall\b", r"\bstorm surge\b",
+        r"\bmaximum sustained wind", r"\bforecast track and intensity\b",
+        r"\bwell marked low pressure area\b",
+        r"lat(?:itude)?\.?\s*[0-9.]+\s*[°ºo]?\s*n",
+    )
+]
+# weak markers: need two of these together
+_WEAK_MARKERS = [
+    re.compile(p, re.I) for p in (
+        r"\bdepression\b", r"\blow pressure area\b", r"\bbay of bengal\b",
+        r"\barabian sea\b", r"\bgale wind\b", r"\bfishermen\b",
+        r"\bwind warning\b", r"\bheavy rainfall\b", r"\bimd\b",
+    )
+]
+
+# words that must never be counted as a storm name even if quoted in caps
+_NAME_STOPWORDS = {
+    "IMD", "RSMC", "UTC", "IST", "BOB", "ARB", "NIO", "TC", "SUB", "NO", "NOS",
+    "RED", "ORANGE", "YELLOW", "GREEN", "ALERT", "WARNING", "WARNINGS",
+    "MESSAGE", "ADVISORY", "ADVISORIES", "BULLETIN", "BULLETINS", "REPORT",
+    "SPECIAL", "NATIONAL", "TROPICAL", "INDIA", "BAY", "SEA", "COAST",
+    "NORTH", "SOUTH", "EAST", "WEST", "OVER", "NEAR", "AND", "THE", "FOR",
+    "NDMA", "INCOIS", "ICG", "NDRF", "PDF", "ESCS", "VSCS", "SCS", "DEEP",
+    "STORM", "CYCLONE", "CYCLONIC", "DEPRESSION", "SEVERE", "SYSTEM",
+    "ADJOINING", "FORECAST", "TRACK", "INTENSITY", "OBSERVED", "ESTIMATED",
+}
+_GRADE_NAME_CUE = (r"(?:super cyclonic storm|extremely severe cyclonic storm|"
+                   r"very severe cyclonic storm|severe cyclonic storm|"
+                   r"cyclonic storm|deep depression|cyclone)")
+
+
+def find_storm_names(text: str, per_page_text: list[str] | None = None) -> list[dict]:
+    """Every distinct storm name literally present, with the page range it
+    appears on. Two naming styles are recognised:
+      * IMD operational style  — a name in quotes, in capitals:  'MANDOUS'
+      * RSMC-report style      — <grade> <Name>  or  <Name> (YYYY)
+    Nothing is inferred; a name not written in the text is not returned."""
+    names: dict[str, str] = {}          # upper -> display form
+
+    def add(raw: str):
+        disp = re.sub(r"\s+", " ", raw).strip(" '\"‘’")
+        key = disp.upper()
+        if (3 <= len(disp) <= 18 and re.fullmatch(r"[A-Za-z][A-Za-z \-]+", disp)
+                and key not in _NAME_STOPWORDS):
+            names.setdefault(key, disp if disp.isupper() else disp.title())
+
+    # (a) IMD operational style: a name in quotes, in capitals — 'MANDOUS'
+    for m in re.finditer(r"[‘’'\"]([A-Z][A-Z][A-Z][A-Z \-]{0,14})[‘’'\"]", text):
+        add(m.group(1))
+    # (b) <grade> then a quoted name (either case) — Cyclonic Storm 'Amphan'
+    for m in re.finditer(_GRADE_NAME_CUE + r"\s+[\"'‘’]([A-Za-z][A-Za-z \-]{2,15})[\"'‘’]",
+                         text, re.I):
+        add(m.group(1))
+    # (c) <grade> then a single Title-Case token (not ALL-CAPS) — Cyclone Remal
+    for m in re.finditer(_GRADE_NAME_CUE + r"\s+([A-Z][a-z]{2,15})\b", text):
+        add(m.group(1))
+    # (d) RSMC-report style: Name (YYYY)
+    for m in re.finditer(r"\b([A-Z][A-Za-z]{2,15})\s*\((?:19|20)\d{2}\)", text):
+        add(m.group(1))
+
+    pages = per_page_text or [text]
+    all_names = list(names.values())
+
+    def names_on(pg: str) -> int:
+        return sum(bool(re.search(r"\b" + re.escape(n) + r"\b", pg or "", re.I))
+                   for n in all_names)
+
+    # a "contents / summary" page mentions several storms at once; a storm's
+    # own section is the pages where it is the ONLY named storm
+    solo_pages = [i for i, pg in enumerate(pages) if names_on(pg) <= 1]
+
+    out = []
+    for disp in all_names:
+        hits = [i + 1 for i, pg in enumerate(pages)
+                if re.search(r"\b" + re.escape(disp) + r"\b", pg or "", re.I)]
+        solo = [i + 1 for i in solo_pages if i + 1 in hits]
+        span = solo or hits or [1]
+        out.append({"name": disp, "first_page": min(span),
+                    "last_page": max(span), "pages": hits or [1]})
+    out.sort(key=lambda d: (d["first_page"], d["name"]))
+    return out
+
+
+def detect_doc_type(text: str, page_count: int = 1,
+                    chars_extracted: int | None = None,
+                    per_page_text: list[str] | None = None) -> dict:
+    """Classify extracted document text. Returns
+    {doc_type, storms_found, reason}. Deterministic; no LLM, no inference."""
+    body = (text or "").strip()
+    if chars_extracted is None:
+        chars_extracted = len(re.sub(r"\s", "", body))
+    page_count = max(1, int(page_count or 1))
+
+    # (d) NO_TEXT_LAYER — extraction returned little or nothing
+    if chars_extracted < 90 or chars_extracted < 12 * page_count:
+        return {"doc_type": "NO_TEXT_LAYER", "storms_found": [],
+                "reason": f"only {chars_extracted} non-space characters over "
+                          f"{page_count} page(s) — likely a scanned / image-only PDF"}
+
+    strong = [m.pattern for m in _BULLETIN_MARKERS if m.search(body)]
+    weak = [m.pattern for m in _WEAK_MARKERS if m.search(body)]
+
+    # (c) NOT_A_BULLETIN — text, but no cyclone-bulletin markers
+    if not strong and len(weak) < 2:
+        return {"doc_type": "NOT_A_BULLETIN", "storms_found": [],
+                "reason": "no cyclone-bulletin markers found in the extracted text"}
+
+    storms = find_storm_names(body, per_page_text)
+    years = sorted(set(re.findall(r"\b(?:19[7-9]\d|20[0-4]\d)\b", body)))
+
+    reasons = []
+    if len(storms) >= 2:
+        reasons.append(f"{len(storms)} distinct storm names")
+    if page_count > _MULTI_STORM_PAGE_THRESHOLD:
+        reasons.append(f"{page_count} pages (> {_MULTI_STORM_PAGE_THRESHOLD})")
+    if len(years) >= 4 and page_count > 3:
+        reasons.append(f"{len(years)} distinct year headers")
+
+    # (b) MULTI_STORM_REPORT — do NOT merge; list storms + page ranges
+    if reasons:
+        return {"doc_type": "MULTI_STORM_REPORT", "storms_found": storms,
+                "reason": "; ".join(reasons)}
+
+    # (a) SINGLE_BULLETIN — one storm, one issue time
+    return {"doc_type": "SINGLE_BULLETIN", "storms_found": storms,
+            "reason": "single system, "
+                      + (f"one storm name ({storms[0]['name']})" if storms
+                         else "bulletin markers present")}
+
+
+def section_text(per_page_text: list[str], first_page: int, last_page: int) -> str:
+    """The text of pages [first_page, last_page] (1-indexed, inclusive)."""
+    lo = max(1, int(first_page)) - 1
+    hi = min(len(per_page_text), int(last_page))
+    return "\n\n".join(per_page_text[lo:hi]).strip()
+
+
 def parse_text(raw: str) -> dict:
     """Deterministic extraction from pasted IMD bulletin text.
     Fields absent from the text are returned as null. Nothing is inferred."""
