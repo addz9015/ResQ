@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ResQ — Cyclone Forecast Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+  :root{ --bg:#0e1116; --panel:#161b22; --line:#2a313c; --text:#e6e9ee; --muted:#8b949e;
+         --accent:#cd7350; --fc:#5aa9e6; --act:#e5484d; --ok:#3fb950; --warn:#e3b341; }
+  *{box-sizing:border-box} html,body{margin:0;height:100%;font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+  #app{display:flex;flex-direction:column;height:100%}
+  header{display:flex;align-items:center;gap:16px;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+  header h1{font-size:14px;margin:0}
+  .tabs{display:flex;gap:2px}
+  .tabs button{font:inherit;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;padding:6px 12px;cursor:pointer}
+  .tabs button:hover{color:var(--text)}
+  .tabs button.active{color:var(--text);border-bottom-color:var(--accent)}
+  .tabview{flex:1;min-height:0;overflow:hidden}
+  .tabview[hidden]{display:none}
+  .grid3{display:grid;grid-template-columns:340px 1fr 330px;height:100%}
+  .grid-fc{display:grid;grid-template-columns:320px 1fr 340px;height:100%}
+  .panel{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:14px}
+  .panel.right{border-right:none;border-left:1px solid var(--line)}
+  .map{height:100%}
+  h2{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:16px 0 6px}
+  h2:first-child{margin-top:0}
+  select,button,input{font:inherit;background:#1f2630;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+  button{cursor:pointer} button:hover{border-color:var(--accent)}
+  .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .controls button{flex:1;min-width:42px}
+  .form label{display:block;font-size:11px;color:var(--muted);margin:8px 0 2px}
+  .form input{width:100%}
+  .f2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  table{width:100%;border-collapse:collapse;font-size:11px} th,td{text-align:right;padding:3px 5px;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  .muted{color:var(--muted)} .big{font-size:26px;font-weight:600}
+  .kv{display:flex;justify-content:space-between;font-size:12px;padding:2px 0}
+  .legend span{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
+  input[type=range]{width:100%}
+  .pill{font-size:10px;padding:1px 6px;border-radius:10px;background:#1f2630;border:1px solid var(--line)}
+  .disc{font-size:10px;color:var(--warn);margin-top:8px;border-top:1px dashed var(--line);padding-top:6px}
+  .card{background:#12161c;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:12px}
+  .ci{font-size:9px;color:var(--muted)}
+  .yes{color:var(--ok)} .no{color:var(--act)}
+  .insights{height:100%;overflow-y:auto;padding:16px;columns:2;column-gap:16px}
+  .insights .card{break-inside:avoid}
+  @media(max-width:1100px){.insights{columns:1}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>ResQ — Cyclone Dashboard <span class="muted" style="font-weight:400">· SIH 2026 PS26070</span></h1>
+    <nav class="tabs">
+      <button data-tab="replay" class="active">Replay</button>
+      <button data-tab="forecast">Forecast</button>
+      <button data-tab="insights">Model insights</button>
+    </nav>
+  </header>
+
+  <!-- ================= REPLAY ================= -->
+  <div class="tabview" id="v-replay">
+   <div class="grid3">
+    <div class="panel">
+      <h2>Storm (2019+ holdout)</h2>
+      <select id="r-storm" style="width:100%"></select>
+      <div id="r-info" class="muted" style="font-size:11px;margin-top:6px"></div>
+      <h2>Replay</h2>
+      <div class="row controls">
+        <button id="r-reset">⟲</button><button id="r-prev">◀ 6h</button>
+        <button id="r-play">▶ play</button><button id="r-next">6h ▶</button>
+      </div>
+      <input type="range" id="r-scrub" min="0" max="0" value="0" style="margin-top:8px" />
+      <div id="r-clock" class="muted" style="font-size:12px"></div>
+      <h2>Forecast issued at this step</h2>
+      <div id="r-issued"></div>
+      <h2>Legend</h2>
+      <div class="legend muted" style="font-size:11px;line-height:1.9">
+        <div><span style="background:#8b949e"></span>observed track so far</div>
+        <div><span style="background:#5aa9e6"></span>forecast track (true CLIPER)</div>
+        <div><span style="background:#e5484d"></span>what actually happened next</div>
+        <div><span style="background:rgba(90,169,230,.25)"></span>conformal cone (80%)</div>
+      </div>
+      <div class="disc">ResQ model estimate — not an official warning.</div>
+    </div>
+    <div id="r-map" class="map"></div>
+    <div class="panel right">
+      <h2>Intensity (Δwind, kt)</h2>
+      <table id="r-inten"><thead><tr><th>lead</th><th>GBM</th><th>analog</th><th>actual</th></tr></thead><tbody></tbody></table>
+      <h2>Rapid intensification (24h ≥ +30 kt)</h2>
+      <div id="r-gauge"></div>
+      <h2>Top-10 analogs</h2>
+      <table id="r-analogs"><thead><tr><th>storm</th><th>yr</th><th>Δw24</th><th>disp24</th><th>grade</th></tr></thead><tbody></tbody></table>
+      <div class="disc">ResQ model estimate — not an official warning.</div>
+    </div>
+   </div>
+  </div>
+
+  <!-- ================= FORECAST ================= -->
+  <div class="tabview" id="v-forecast" hidden>
+   <div class="grid-fc">
+    <div class="panel form">
+      <h2>Prefill — real 2019+ state</h2>
+      <select id="f-preset" style="width:100%"></select>
+      <h2>System state (we forecast its evolution)</h2>
+      <div class="f2">
+        <div><label>latitude °N</label><input id="f-lat" type="number" step="0.1" value="12.0"></div>
+        <div><label>longitude °E</label><input id="f-lon" type="number" step="0.1" value="88.0"></div>
+        <div><label>current wind (kt)</label><input id="f-wind" type="number" step="1" value="45"></div>
+        <div><label>central pressure (hPa)</label><input id="f-pres" type="number" step="1" value="990"></div>
+        <div><label>prev-6h latitude</label><input id="f-plat" type="number" step="0.1" value="11.7"></div>
+        <div><label>prev-6h longitude</label><input id="f-plon" type="number" step="0.1" value="88.5"></div>
+        <div><label>storm age (h)</label><input id="f-age" type="number" step="6" value="36"></div>
+        <div><label>date</label><input id="f-date" type="date" value="2020-11-01"></div>
+      </div>
+      <div class="muted" style="font-size:10px;margin:6px 0">basin is derived from longitude (&lt;78°E → Arabian Sea, else Bay of Bengal). No temperature or humidity inputs — no model uses them.</div>
+      <button id="f-go" style="width:100%;margin-top:8px;border-color:var(--accent)">Forecast →</button>
+      <div class="disc">ResQ model estimate — not an official warning.</div>
+    </div>
+    <div id="f-map" class="map"></div>
+    <div class="panel right">
+      <h2>Track — 6/12/24 h</h2>
+      <div id="f-track" class="muted" style="font-size:11px">Run a forecast.</div>
+      <h2>Intensity Δwind (kt) — 80% conformal interval</h2>
+      <table id="f-inten"><thead><tr><th>lead</th><th>Δwind</th><th>80% interval</th></tr></thead><tbody></tbody></table>
+      <div id="f-covnote" class="muted" style="font-size:10px"></div>
+      <h2>Rapid intensification</h2>
+      <div id="f-gauge"></div>
+      <h2>Top-10 analogs — Δwind + deciles</h2>
+      <div id="f-analogs"></div>
+      <div class="disc">ResQ model estimate — not an official warning.</div>
+    </div>
+   </div>
+  </div>
+
+  <!-- ================= INSIGHTS ================= -->
+  <div class="tabview" id="v-insights" hidden>
+    <div id="ins" class="insights">loading…</div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const el = id => document.getElementById(id);
+const fmt = (v,d=1) => v==null||Number.isNaN(v)? '—' : (+v).toFixed(d);
+function haversine(la1,lo1,la2,lo2){const R=6371,r=Math.PI/180;
+  const dLa=(la2-la1)*r,dLo=(lo2-lo1)*r;
+  const a=Math.sin(dLa/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));}
+
+// ---- tabs ----
+let insightsLoaded=false;
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active',x===b));
+  ['replay','forecast','insights'].forEach(t=>el('v-'+t).hidden = t!==b.dataset.tab);
+  if(b.dataset.tab==='replay'){ ensureReplayMap(); }
+  if(b.dataset.tab==='forecast'){ ensureFcMap(); }
+  if(b.dataset.tab==='insights' && !insightsLoaded){ loadInsights(); insightsLoaded=true; }
+});
+
+// ---- shared gauge ----
+function gaugeSVG(p){
+  const v=p.combined, base=p.base_rate, W=280,H=132,cx=W/2,cy=H-8,r=104;
+  const ang=x=>Math.PI-Math.PI*Math.min(x/0.6,1);
+  const pt=(x,rr)=>[cx+rr*Math.cos(ang(x)),cy-rr*Math.sin(ang(x))];
+  const arc=(x0,x1,rr)=>{const [a,b]=pt(x0,rr),[c,d]=pt(x1,rr);return `M ${a} ${b} A ${rr} ${rr} 0 0 1 ${c} ${d}`;};
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%">
+    <path d="${arc(0,0.6,r)}" stroke="#2a313c" stroke-width="13" fill="none" stroke-linecap="round"/>
+    <path d="${arc(0,v,r)}" stroke="#cd7350" stroke-width="13" fill="none" stroke-linecap="round"/>
+    <line x1="${pt(base,r-11)[0]}" y1="${pt(base,r-11)[1]}" x2="${pt(base,r+11)[0]}" y2="${pt(base,r+11)[1]}" stroke="#3fb950" stroke-width="2"/>
+    <text x="${cx}" y="${cy-28}" text-anchor="middle" class="big" fill="#e6e9ee">${(v*100).toFixed(0)}%</text>
+    <text x="${cx}" y="${cy-13}" text-anchor="middle" font-size="10" fill="#8b949e">P(RI ≥ +30 kt / 24 h)</text></svg>
+   <div class="row" style="font-size:11px;justify-content:space-between">
+    <span class="pill">analog ${(p.analog*100).toFixed(0)}%</span>
+    <span class="pill">classifier ${(p.classifier*100).toFixed(0)}%</span>
+    <span class="pill" style="border-color:#3fb950">climatology ${(base*100).toFixed(1)}%</span></div>`;
+}
+
+// ================= REPLAY =================
+let rMap=null, rLayers=null, R_STORM=null, R_STEP=0, rTimer=null;
+function ensureReplayMap(){
+  if(rMap){ rMap.invalidateSize(); return; }
+  rMap=L.map('r-map',{worldCopyJump:true}).setView([13,86],5);
+  L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
+    {maxZoom:9,attribution:'&copy; OpenStreetMap, &copy; CARTO'}).addTo(rMap);
+  rLayers=L.layerGroup().addTo(rMap);
+  loadReplayList();
+}
+async function loadReplayList(){
+  const d=await (await fetch('/api/replay')).json();
+  el('r-storm').innerHTML=d.storms.map(s=>`<option value="${s.id}">${s.name} ${s.id} (${s.n_forecasts} steps)</option>`).join('');
+  el('r-storm').onchange=()=>loadReplayStorm(el('r-storm').value);
+  if(d.storms.length) loadReplayStorm(d.storms[0].id);
+}
+async function loadReplayStorm(id){
+  rStop(); R_STORM=await (await fetch('/api/replay/'+encodeURIComponent(id))).json(); R_STEP=0;
+  el('r-scrub').max=R_STORM.steps.length-1; el('r-scrub').value=0;
+  el('r-info').textContent=`${R_STORM.name} · ${R_STORM.year} · ${R_STORM.track.length} fixes · ${R_STORM.steps.length} hindcast steps`;
+  const la=R_STORM.track.map(p=>p.lat), lo=R_STORM.track.map(p=>p.lon);
+  rMap.fitBounds([[Math.min(...la)-2,Math.min(...lo)-2],[Math.max(...la)+2,Math.max(...lo)+2]]);
+  rRender();
+}
+el('r-scrub').oninput=e=>{R_STEP=+e.target.value;rRender();};
+el('r-next').onclick=()=>{R_STEP=Math.min(R_STEP+1,R_STORM.steps.length-1);el('r-scrub').value=R_STEP;rRender();};
+el('r-prev').onclick=()=>{R_STEP=Math.max(R_STEP-1,0);el('r-scrub').value=R_STEP;rRender();};
+el('r-reset').onclick=()=>{R_STEP=0;el('r-scrub').value=0;rRender();};
+el('r-play').onclick=()=>rTimer?rStop():rPlay();
+function rPlay(){el('r-play').textContent='⏸ pause';
+  rTimer=setInterval(()=>{if(R_STEP>=R_STORM.steps.length-1){rStop();return;}R_STEP++;el('r-scrub').value=R_STEP;rRender();},900);}
+function rStop(){clearInterval(rTimer);rTimer=null;el('r-play').textContent='▶ play';}
+function rRender(){
+  if(!R_STORM) return;
+  rLayers.clearLayers();
+  const step=R_STORM.steps[R_STEP], oi=step.i;
+  L.polyline(R_STORM.track.slice(0,oi+1).map(p=>[p.lat,p.lon]),{color:'#8b949e',weight:2}).addTo(rLayers);
+  R_STORM.track.slice(0,oi+1).forEach(p=>L.circleMarker([p.lat,p.lon],{radius:2.5,color:'#8b949e',fillOpacity:.8}).addTo(rLayers));
+  const o=step.forecast.origin;
+  L.circleMarker([o.lat,o.lon],{radius:6,color:'#e6e9ee',weight:2,fillColor:'#161b22',fillOpacity:1}).addTo(rLayers).bindTooltip(`issued · ${o.wind_kt} kt`);
+  const fp=[[o.lat,o.lon]];
+  step.forecast.track.forEach(t=>{
+    L.polygon(t.cone,{color:'#5aa9e6',weight:1,fillColor:'#5aa9e6',fillOpacity:.12}).addTo(rLayers);
+    fp.push([t.lat,t.lon]);
+    L.circleMarker([t.lat,t.lon],{radius:4,color:'#5aa9e6',fillOpacity:1}).addTo(rLayers).bindTooltip(`+${t.lead_h}h`);
+  });
+  L.polyline(fp,{color:'#5aa9e6',weight:2}).addTo(rLayers);
+  const act=[[o.lat,o.lon]];
+  [6,12,24].forEach(h=>{const a=step.actual[h+'h'];if(a)act.push([a.lat,a.lon]);});
+  if(act.length>1){ L.polyline(act,{color:'#e5484d',weight:2,dashArray:'5 4'}).addTo(rLayers);
+    act.slice(1).forEach(p=>L.circleMarker(p,{radius:3.5,color:'#e5484d',fillOpacity:1}).addTo(rLayers)); }
+  el('r-clock').textContent=new Date(step.t*1000).toISOString().replace('T',' ').slice(0,16)+' UTC · step '+(R_STEP+1)+'/'+R_STORM.steps.length;
+  const ge=(a,b)=>a&&b?haversine(a.lat,a.lon,b.lat,b.lon).toFixed(0)+' km':'—';
+  el('r-issued').innerHTML=step.forecast.track.map(t=>{
+    const a=step.actual[t.lead_h+'h'];
+    return `<div class="kv"><span>+${t.lead_h}h track err</span><span>${a?ge(t,a):'<span class=muted>pending</span>'}</span></div>`;}).join('');
+  const ib=el('r-inten').querySelector('tbody');
+  ib.innerHTML=step.forecast.intensity.map(it=>{
+    const a=step.actual[it.lead_h+'h']; const d=a?(a.wind-o.wind_kt):null;
+    return `<tr><td>+${it.lead_h}h</td><td>${fmt(it.dwind_gbm)}</td><td>${fmt(it.dwind_analog)}</td><td>${d==null?'<span class=muted>—</span>':fmt(d)}</td></tr>`;}).join('');
+  el('r-gauge').innerHTML=gaugeSVG(step.forecast.p_ri);
+  el('r-analogs').querySelector('tbody').innerHTML=step.forecast.analogs.map(a=>
+    `<tr><td>${a.name==='(unnamed)'?a.storm_id:a.name}</td><td>${a.year}</td><td>${fmt(a.d_wind_24h,0)}</td><td>${fmt(a.disp_24h_km,0)}</td><td>${fmt(a.eventual_peak_grade_ord,0)}</td></tr>`).join('');
+}
+
+// ================= FORECAST =================
+let fMap=null, fLayers=null, PRESETS=[];
+function ensureFcMap(){
+  if(fMap){ fMap.invalidateSize(); return; }
+  fMap=L.map('f-map',{worldCopyJump:true}).setView([13,86],5);
+  L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
+    {maxZoom:9,attribution:'&copy; OpenStreetMap, &copy; CARTO'}).addTo(fMap);
+  fLayers=L.layerGroup().addTo(fMap);
+  loadPresets();
+}
+async function loadPresets(){
+  const d=await (await fetch('/api/presets')).json(); PRESETS=d.presets;
+  el('f-preset').innerHTML='<option value="">— pick a real 2019+ state —</option>'+
+    PRESETS.map((p,i)=>`<option value="${i}">${p.label}</option>`).join('');
+  el('f-preset').onchange=()=>{ const p=PRESETS[+el('f-preset').value]; if(!p) return;
+    el('f-lat').value=p.lat; el('f-lon').value=p.lon; el('f-wind').value=p.wind_kt;
+    el('f-pres').value=p.pressure_hpa??''; el('f-plat').value=p.prev_lat; el('f-plon').value=p.prev_lon;
+    el('f-age').value=p.storm_age_hours; el('f-date').value=p.date; runForecast(); };
+}
+el('f-go').onclick=runForecast;
+async function runForecast(){
+  const lat=+el('f-lat').value, lon=+el('f-lon').value;
+  const body={ lat, lon, wind_kt:+el('f-wind').value,
+    pressure_hpa: el('f-pres').value===''?null:+el('f-pres').value,
+    dlat_6h: lat-(+el('f-plat').value), dlon_6h: lon-(+el('f-plon').value),
+    storm_age_hours:+el('f-age').value,
+    month: new Date(el('f-date').value||'2020-06-15').getUTCMonth()+1,
+    basin: lon<78?'ARB':'BOB' };
+  const fc=await (await fetch('/api/forecast',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)})).json();
+  drawForecast(body,fc);
+}
+function drawForecast(inp,fc){
+  fLayers.clearLayers();
+  const o=fc.origin;
+  L.circleMarker([o.lat,o.lon],{radius:6,color:'#e6e9ee',weight:2,fillColor:'#161b22',fillOpacity:1}).addTo(fLayers).bindTooltip(`input · ${o.wind_kt} kt`);
+  L.polyline([[inp.lat-inp.dlat_6h,inp.lon-inp.dlon_6h],[o.lat,o.lon]],{color:'#8b949e',weight:2}).addTo(fLayers);
+  const fp=[[o.lat,o.lon]];
+  fc.track.forEach(t=>{
+    L.polygon(t.cone,{color:'#5aa9e6',weight:1,fillColor:'#5aa9e6',fillOpacity:.12}).addTo(fLayers);
+    fp.push([t.lat,t.lon]);
+    L.circleMarker([t.lat,t.lon],{radius:4,color:'#5aa9e6',fillOpacity:1}).addTo(fLayers).bindTooltip(`+${t.lead_h}h`);
+  });
+  L.polyline(fp,{color:'#5aa9e6',weight:2}).addTo(fLayers);
+  fMap.fitBounds(fp.concat([[inp.lat-inp.dlat_6h,inp.lon-inp.dlon_6h]]),{padding:[40,40]});
+  el('f-track').innerHTML='forecast track = <b>persistence-motion</b> (the best track baseline; §7 significance.md — no learned model beats it). Cone = 80% conformal along/cross-track.'+
+    fc.track.map(t=>`<div class="kv"><span>+${t.lead_h}h</span><span>${t.lat.toFixed(2)}°N ${t.lon.toFixed(2)}°E</span></div>`).join('');
+  el('f-inten').querySelector('tbody').innerHTML=fc.intensity.map(it=>
+    `<tr><td>+${it.lead_h}h</td><td>${fmt(it.dwind_gbm)}</td><td>[${fmt(it.dwind_lo)}, ${fmt(it.dwind_hi)}]</td></tr>`).join('');
+  const c24=fc.intensity[2];
+  el('f-covnote').textContent=`Note: the 24 h Δwind interval is nominal ${Math.round(c24.interval_nominal*100)}% but empirically covers `+
+    `${c24.interval_empirical_coverage==null?'~75':(c24.interval_empirical_coverage*100).toFixed(0)}% on the 2019+ test (conditional-coverage gap).`;
+  el('f-gauge').innerHTML=gaugeSVG(fc.p_ri)+
+    `<div class="muted" style="font-size:10px;margin-top:4px">combined = mean of calibrated analog + classifier · green tick = 5.9% climatological base rate</div>`;
+  el('f-analogs').innerHTML=`<table><thead><tr><th>storm</th><th>yr</th><th>Δw6</th><th>Δw12</th><th>Δw24</th><th>disp24</th><th>grade</th></tr></thead><tbody>`+
+    fc.analogs.map(a=>`<tr><td>${a.name==='(unnamed)'?a.storm_id:a.name}</td><td>${a.year}</td><td>${fmt(a.d_wind_6h,0)}</td><td>${fmt(a.d_wind_12h,0)}</td><td>${fmt(a.d_wind_24h,0)}</td><td>${fmt(a.disp_24h_km,0)}</td><td>${fmt(a.eventual_peak_grade_ord,0)}</td></tr>`).join('')+
+    `</tbody></table><div class="muted" style="font-size:10px;margin-top:4px">analog Δwind deciles (kt) at 24 h: `+
+    (fc.intensity[2].dwind_deciles||[]).map(v=>fmt(v,0)).join(' · ')+`</div>`;
+}
+
+// ================= INSIGHTS =================
+function bars(items,val,err,fmt2,color){
+  const max=Math.max(...items.map(d=>val(d)+(err?err(d):0)),0.01);
+  return items.map(d=>{
+    const w=100*val(d)/max, e=err?100*err(d)/max:0;
+    return `<div style="margin:3px 0"><div class="row" style="justify-content:space-between;font-size:10px"><span>${d.label}</span><span>${fmt2(val(d))}</span></div>
+     <div style="position:relative;height:9px;background:#1f2630;border-radius:3px">
+       <div style="position:absolute;height:100%;width:${w}%;background:${color||'#cd7350'};border-radius:3px"></div>
+       ${err?`<div style="position:absolute;left:${w-e}%;width:${2*e}%;height:100%;border-left:1px solid #e6e9ee;border-right:1px solid #e6e9ee;opacity:.7"></div>`:''}
+     </div></div>`;}).join('');
+}
+function lineChart(pts,xf,yf,xlab,ylab){
+  const W=300,H=110,pad=26;
+  const xs=v=>pad+v*(W-pad-6), ys=v=>H-pad-v*(H-pad-6);
+  const p=pts.map((d,i)=>`${i?'L':'M'} ${xs(xf(d))} ${ys(yf(d))}`).join(' ');
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%">
+    <line x1="${xs(0)}" y1="${ys(0)}" x2="${xs(1)}" y2="${ys(1)}" stroke="#2a313c" stroke-dasharray="3 3"/>
+    <path d="${p}" stroke="#5aa9e6" fill="none" stroke-width="1.5"/>
+    ${pts.map(d=>`<circle cx="${xs(xf(d))}" cy="${ys(yf(d))}" r="2.5" fill="#5aa9e6"/>`).join('')}
+    <text x="${xs(0.5)}" y="${H-4}" text-anchor="middle" font-size="9" fill="#8b949e">${xlab}</text>
+    <text x="8" y="${ys(0.5)}" font-size="9" fill="#8b949e" transform="rotate(-90 8 ${ys(0.5)})">${ylab}</text></svg>`;
+}
+async function loadInsights(){
+  const d=await (await fetch('/static/data/insights.json')).json();
+  const L=['6h','12h','24h'];
+  let h='';
+
+  // primary table with CI
+  h+=`<div class="card"><h2>Primary comparison — 2019+ test, with 95% cluster-bootstrap CI</h2>
+    <table><thead><tr><th>model</th>${L.map(l=>`<th>track ${l}</th>`).join('')}${L.map(l=>`<th>Δw ${l}</th>`).join('')}</tr></thead><tbody>`;
+  d.primary.models.forEach(m=>{
+    const cell=(o,f)=>o&&o.value!=null?`<td>${(+o.value).toFixed(f)}${o.ci?`<div class="ci">[${o.ci.lo.toFixed(f)}, ${o.ci.hi.toFixed(f)}]</div>`:''}</td>`:'<td>—</td>';
+    h+=`<tr><td>${m.model}</td>${L.map(l=>cell(m.track[l],0)).join('')}${L.map(l=>cell(m.dwind[l],1)).join('')}</tr>`;});
+  h+=`</tbody></table><div class="ci">n per lead: ${d.primary.n_per_lead['6']}/${d.primary.n_per_lead['12']}/${d.primary.n_per_lead['24']}</div></div>`;
+
+  // supported / not
+  const s=d.supported;
+  h+=`<div class="card"><h2>What holds up statistically (${s.n_test_storms} test storms, ${s.n_RI_positive} RI cases)</h2>
+    <div><b class="yes">Supported (95%)</b><ul style="margin:4px 0 8px;padding-left:18px;font-size:11px">${s.supported.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <b class="no">Not supported — point estimate only</b><ul style="margin:4px 0 0;padding-left:18px;font-size:11px">${s.not_supported.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+    <div class="ci">source: reports/significance.md (cluster bootstrap by storm)</div></div>`;
+
+  // RI PR-AUC bars + reliability
+  const ra=d.ri.pr_auc_ci;
+  const items=Object.entries(ra).filter(([k,v])=>v).map(([k,v])=>({label:k,...v}));
+  h+=`<div class="card"><h2>RI — PR-AUC with 95% CI (base rate ${d.ri.pr_auc_baseline.toFixed(3)})</h2>
+    ${bars(items,d=>d.point,d=>Math.max(d.hi-d.point,d.point-d.lo),v=>v.toFixed(3))}
+    <h2 style="margin-top:12px">RI reliability — combined P(RI), pre-2019 folds</h2>
+    ${lineChart(d.ri.reliability.filter(b=>b.mean_pred!=null),b=>b.mean_pred,b=>b.empirical,'predicted P(RI)','observed')}
+    <div class="ci">diagonal = perfectly calibrated</div></div>`;
+
+  // coverage
+  h+=`<div class="card"><h2>Δwind interval coverage — marginal / split-CQR / cross-conformal</h2>
+    <table><thead><tr><th>lead</th><th>nominal</th><th>marginal</th><th>split-CQR</th><th>cross-conf</th></tr></thead><tbody>`;
+  d.coverage.rows.forEach(r=>{ h+=`<tr><td>${r.lead}</td><td>${r.nominal.toFixed(2)}</td><td>${r.marginal.toFixed(2)}</td><td>${r.split_cqr.toFixed(2)}</td><td>${r.cross_conformal==null?'—':r.cross_conformal.toFixed(2)}</td></tr>`;});
+  h+=`</tbody></table><div class="ci">n test = ${d.coverage.n_test}. 24 h reaches ~0.75 vs nominal 0.80 — conditional-coverage limit.</div></div>`;
+
+  // permutation importance
+  if(d.perm_importance && d.perm_importance.available){
+    const pi=d.perm_importance.features.slice(0,12).map(f=>({label:f.name,point:f.mean,std:f.std}));
+    h+=`<div class="card"><h2>RI classifier — permutation importance (${d.perm_importance.metric}, ${d.perm_importance.scored_on})</h2>
+      ${bars(pi,d=>Math.max(d.point,0),d=>d.std,v=>v.toFixed(3),'#5aa9e6')}
+      <div class="ci">permutation importance (not SHAP). Bars = mean PR-AUC drop when the feature is shuffled; whisker = ±1 sd over 20 repeats.</div></div>`;
+  }
+
+  // M1 tuning
+  const t=d.tuning;
+  if(t && t.selected){
+    h+=`<div class="card"><h2>M1 — RI ensemble tuning (selected on pre-2019 OOF only)</h2>
+      <div style="font-size:11px">
+      <div class="kv"><span>classifier HGB</span><span>${JSON.stringify(t.selected.hgb_params)}</span></div>
+      <div class="kv"><span>analog k</span><span>${t.selected.analog_k}</span></div>
+      <div class="kv"><span>weight on analog</span><span>${t.selected.average_weight_on_analog}</span></div>
+      <div class="kv"><span>OOF PR-AUC (ensemble)</span><span>${t.oof_pr_auc.weighted_ensemble_pr_auc.toFixed(3)}</span></div>
+      <div class="kv"><span>test PR-AUC — pre-tuning average</span><span>${t.pre_tuning_test_pr_auc.average_pr_auc.toFixed(3)}</span></div>
+      <div class="kv"><span>test PR-AUC — tuned ensemble</span><span>${t.post_tuning_test_pr_auc.tuned_ensemble_pr_auc.toFixed(3)}</span></div>
+      <div class="kv"><span>test score moved?</span><span>${t.test_score_moved?'yes, +'+t.test_pr_auc_change_vs_prev_average.toFixed(3):'no'} (within bootstrap noise ±~0.15)</span></div>
+      </div><div class="ci">${t.note}</div></div>`;
+  }
+
+  // M2 learning curve
+  const lc=d.learning_curve;
+  if(lc && lc.curve){
+    h+=`<div class="card"><h2>M2 — RI learning curve: data-starved or overfitting?</h2>
+      <img src="${d.learning_curve_png}" style="width:100%;border-radius:6px" alt="learning curve"/>
+      <div style="font-size:11px;margin-top:6px">${lc.regime}</div></div>`;
+  }
+
+  // M3 fit diagnostics
+  const fd=d.fit_diagnostics;
+  if(fd && fd.rows){
+    h+=`<div class="card"><h2>M3 — fit diagnostics (train vs OOF vs test)</h2>
+      <table><thead><tr><th>model</th><th>metric</th><th>train</th><th>OOF</th><th>test</th><th>flag</th></tr></thead><tbody>`;
+    fd.rows.forEach(r=>{ const f=r.metric==='PR-AUC'?3:1;
+      h+=`<tr><td>${r.model}</td><td>${r.metric}</td><td>${r.train.toFixed(f)}</td><td>${r.oof.toFixed(f)}</td><td>${r.test.toFixed(f)}</td><td class="${r.flag==='OVERFIT'?'no':''}">${r.flag}</td></tr>`;});
+    h+=`</tbody></table><div class="ci">${fd.lstm?fd.lstm.note:''}</div></div>`;
+  }
+
+  el('ins').innerHTML=h;
+}
+
+// boot on the default tab
+ensureReplayMap();
+</script>
+</body>
+</html>
