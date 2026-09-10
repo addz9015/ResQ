@@ -1,0 +1,10 @@
+# ResQ — OPTIONAL ERA5 environmental predictors (src/era5.py).
+# Not required for anything else. src/era5.py fails cleanly without these and
+# writes data/cyclone_6h_with_env.parquet with the env columns left NULL.
+#
+#   pip install -r requirements-era5.txt
+#   then create ~/.cdsapirc with a free CDS API key
+#   (https://cds.climate.copernicus.eu/how-to-api)
+cdsapi==0.7.4
+xarray==2024.7.0
+netcdf4==1.7.1

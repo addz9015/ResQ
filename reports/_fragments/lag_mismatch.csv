@@ -1,0 +1,5 @@
+shipped_column,compared_rows,mismatches_gt_1e-6,mismatch_rate_pct,shipped_notnull_recomp_null,recomp_notnull_shipped_null,max_abs_diff
+wind_kt_lag1,6779,0,0.0,0,171,0.0
+wind_tendency_3h,6740,0,0.0,0,171,0.0
+pressure_lag1,6315,0,0.0,0,169,0.0
+pressure_tendency_3h,6271,0,0.0,0,169,0.0

@@ -1,0 +1,44 @@
+{
+  "raw_rows_in": 7531,
+  "segments_total": 671,
+  "segments_kept": 317,
+  "segments_dropped_lt_5_grid_pts": 354,
+  "resampled_rows_out": 4469,
+  "raw_segment_len_points": {
+    "min": 1,
+    "p25": 2.0,
+    "median": 5.0,
+    "p75": 17.0,
+    "max": 97,
+    "mean": 11.22
+  },
+  "grid_segment_len_points": {
+    "min": 5,
+    "p25": 8.0,
+    "median": 13.0,
+    "p75": 18.0,
+    "max": 53,
+    "mean": 14.1
+  },
+  "grid_len_histogram": {
+    "5-9": 81,
+    "9-13": 73,
+    "13-21": 105,
+    "21-33": 49,
+    "33-999": 9
+  },
+  "wind_interpolated_fraction_all": 0.201,
+  "wind_interpolated_fraction_holdout": 0.126,
+  "holdout_segments": 76,
+  "holdout_storms": 76,
+  "holdout_target_rows_per_lead": {
+    "6h": 1095,
+    "12h": 1019,
+    "24h": 867
+  },
+  "holdout_target_interp_fraction_per_lead": {
+    "6h": 0.123,
+    "12h": 0.117,
+    "24h": 0.107
+  }
+}

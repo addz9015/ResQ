@@ -1,0 +1,64 @@
+{
+  "n_cyclone_rows": 7656,
+  "n_background_rows": 9000,
+  "auc_all_features_no_provenance": 0.9999735719261581,
+  "features_used": [
+    "lat",
+    "lon",
+    "imd_pressure_hpa",
+    "imd_pressure_drop",
+    "storm_age_hours",
+    "month_sin",
+    "month_cos",
+    "doy_sin",
+    "doy_cos",
+    "dt_snap_hour",
+    "wind_kt_lag1",
+    "pressure_lag1",
+    "wind_tendency_3h",
+    "pressure_tendency_3h",
+    "basin_ARB",
+    "basin_BOB",
+    "basin_LAND"
+  ],
+  "auc_lat_lon_month_only": 0.9984716562173458,
+  "integer_value_fraction": {
+    "wind_kt_canonical": {
+      "cyclone": 1.0,
+      "background": 0.12
+    },
+    "imd_pressure_hpa": {
+      "cyclone": 1.0,
+      "background": 0.106
+    },
+    "wind_kt_lag1": {
+      "cyclone": 1.0,
+      "background": 0.117
+    },
+    "pressure_lag1": {
+      "cyclone": 1.0,
+      "background": 0.108
+    }
+  },
+  "wind_kt_canonical_range": {
+    "cyclone": [
+      15.0,
+      140.0
+    ],
+    "background": [
+      0.5,
+      27.0
+    ]
+  },
+  "lag_autocorr_wind_vs_lag1": {
+    "cyclone": 0.9677581887897511,
+    "background": 0.5272853181049081
+  },
+  "storm_id_code_unique_in_background": [
+    -1
+  ],
+  "background_timestamp_gap_days": {
+    "median": 0.125,
+    "max": 738.25
+  }
+}

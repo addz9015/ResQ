@@ -1,0 +1,86 @@
+{
+  "M1_tuning": {
+    "grid_sizes": {
+      "hgb": 24,
+      "k": 5,
+      "w": 7
+    },
+    "selected": {
+      "hgb_params": {
+        "learning_rate": 0.05,
+        "max_depth": 2,
+        "max_iter": 300,
+        "l2_regularization": 1.0,
+        "min_samples_leaf": 20
+      },
+      "analog_k": 30,
+      "average_weight_on_analog": 0.25
+    },
+    "oof_pr_auc": {
+      "classifier_pr_auc": 0.20528028541198826,
+      "analog_raw_pr_auc": 0.11664769959381727,
+      "weighted_ensemble_pr_auc": 0.22691225143854676
+    },
+    "pre_tuning_test_pr_auc": {
+      "average_pr_auc": 0.2467939561335586,
+      "classifier_pr_auc": 0.18938564291902782,
+      "analog_pr_auc": 0.18682168904846794
+    },
+    "post_tuning_test_pr_auc": {
+      "classifier_pr_auc": 0.24971560670699208,
+      "analog_pr_auc": 0.18498424703634897,
+      "tuned_ensemble_pr_auc": 0.2760149777861372
+    },
+    "test_pr_auc_change_vs_prev_average": 0.029221021652578616,
+    "test_score_moved": true,
+    "note": "selection used ONLY pre-2019 GroupKFold OOF PR-AUC; the 2019+ test was scored once, after all choices were frozen"
+  },
+  "M2_learning_curve": {
+    "curve": [
+      {
+        "n_storms": 50,
+        "n_states": 440,
+        "n_RI": 22,
+        "oof_pr_auc_ensemble": 0.17005274386349553,
+        "oof_pr_auc_classifier": 0.13665558617247903,
+        "base_rate": 0.05
+      },
+      {
+        "n_storms": 90,
+        "n_states": 873,
+        "n_RI": 52,
+        "oof_pr_auc_ensemble": 0.11986185470512215,
+        "oof_pr_auc_classifier": 0.0971932022603582,
+        "base_rate": 0.05956471935853379
+      },
+      {
+        "n_storms": 130,
+        "n_states": 1267,
+        "n_RI": 81,
+        "oof_pr_auc_ensemble": 0.19136686847589512,
+        "oof_pr_auc_classifier": 0.16152337059246452,
+        "base_rate": 0.06393054459352802
+      },
+      {
+        "n_storms": 170,
+        "n_states": 1659,
+        "n_RI": 100,
+        "oof_pr_auc_ensemble": 0.1994529162503665,
+        "oof_pr_auc_classifier": 0.17254985581377594,
+        "base_rate": 0.06027727546714889
+      },
+      {
+        "n_storms": 183,
+        "n_states": 1781,
+        "n_RI": 105,
+        "oof_pr_auc_ensemble": 0.22691225143854676,
+        "oof_pr_auc_classifier": 0.19848877675505971,
+        "base_rate": 0.058955642897248736
+      }
+    ],
+    "regime": "**data-starved on positive cases.** The OOF PR-AUC curve is noisy (only ~20-105 RI events across the sampled sizes) but its trend over the larger sizes is upward (slope +5.60e-04 per storm) and the full-data point is the highest. More RI-labelled storms \u2014 i.e. more years, which in practice means the ERA5 era \u2014 should raise the ceiling. It is not overfitting (see M3).",
+    "second_half_slope": 0.0005601394856805897,
+    "endpoint_is_max": true,
+    "rising": true
+  }
+}

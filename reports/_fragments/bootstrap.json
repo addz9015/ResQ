@@ -1,0 +1,611 @@
+{
+  "ri": {
+    "n_test_states": 791,
+    "n_test_storms": 71,
+    "n_RI_positive": 48,
+    "climatology_rate": 0.058955642897248736,
+    "metrics": {
+      "analog_roc_auc": {
+        "point": 0.7874607447285777,
+        "lo": 0.6966215176328815,
+        "hi": 0.8620623210741768,
+        "n_valid_reps": 1000
+      },
+      "analog_pr_auc": {
+        "point": 0.18682168904846794,
+        "lo": 0.0928096942930963,
+        "hi": 0.31707121497943613,
+        "n_valid_reps": 1000
+      },
+      "analog_brier": {
+        "point": 0.053157609971270926,
+        "lo": 0.03071118620145345,
+        "hi": 0.07788492842082208,
+        "n_valid_reps": 1000
+      },
+      "classifier_roc_auc": {
+        "point": 0.7964053387169135,
+        "lo": 0.6615584863585064,
+        "hi": 0.89190415785749,
+        "n_valid_reps": 1000
+      },
+      "classifier_pr_auc": {
+        "point": 0.18938564291902782,
+        "lo": 0.07299643809373138,
+        "hi": 0.3901715013508123,
+        "n_valid_reps": 1000
+      },
+      "classifier_brier": {
+        "point": 0.05259365927835606,
+        "lo": 0.032337914997362036,
+        "hi": 0.07540541722949483,
+        "n_valid_reps": 1000
+      },
+      "average_roc_auc": {
+        "point": 0.8423620457604307,
+        "lo": 0.7298030913159447,
+        "hi": 0.913163784894262,
+        "n_valid_reps": 1000
+      },
+      "average_pr_auc": {
+        "point": 0.2467939561335586,
+        "lo": 0.10381671841571197,
+        "hi": 0.4880731243354829,
+        "n_valid_reps": 1000
+      },
+      "average_brier": {
+        "point": 0.052234124068895264,
+        "lo": 0.030880706914402267,
+        "hi": 0.07610776078069202,
+        "n_valid_reps": 1000
+      },
+      "stack_roc_auc": {
+        "point": 0.8241644235082997,
+        "lo": 0.703753242556056,
+        "hi": 0.9098977482519058,
+        "n_valid_reps": 1000
+      },
+      "stack_pr_auc": {
+        "point": 0.2305957387975759,
+        "lo": 0.08732541791573789,
+        "hi": 0.46620413997331495,
+        "n_valid_reps": 1000
+      },
+      "stack_brier": {
+        "point": 0.05630450540750319,
+        "lo": 0.03177602514095652,
+        "hi": 0.08365786785355651,
+        "n_valid_reps": 1000
+      },
+      "climatology_brier": {
+        "point": 0.057003275138990644,
+        "lo": 0.03291416116641193,
+        "hi": 0.08411979349643856,
+        "n_valid_reps": 1000
+      }
+    },
+    "paired": {
+      "average_minus_analog_pr_auc": {
+        "improvement": 0.05997226708509065,
+        "lo": -0.012131621233321756,
+        "hi": 0.19765395130794625,
+        "significant": false,
+        "sig_either_way": false,
+        "crosses_zero": true,
+        "verdict": "tie (CI crosses 0)"
+      },
+      "average_minus_classifier_pr_auc": {
+        "improvement": 0.05740831321453077,
+        "lo": 0.00885531540976068,
+        "hi": 0.12665951681560028,
+        "significant": true,
+        "sig_either_way": true,
+        "crosses_zero": false,
+        "verdict": "a significantly better"
+      },
+      "average_minus_stack_pr_auc": {
+        "improvement": 0.0161982173359827,
+        "lo": -0.005913509480238066,
+        "hi": 0.043608801326441654,
+        "significant": false,
+        "sig_either_way": false,
+        "crosses_zero": true,
+        "verdict": "tie (CI crosses 0)"
+      },
+      "average_beats_climatology_brier": {
+        "improvement": 0.00476915107009538,
+        "lo": 0.0011522438461344616,
+        "hi": 0.008934623923583808,
+        "significant": true,
+        "sig_either_way": true,
+        "crosses_zero": false,
+        "verdict": "a significantly better"
+      },
+      "analog_beats_climatology_brier": {
+        "improvement": 0.003845665167719718,
+        "lo": 0.0012442920345463518,
+        "hi": 0.006578177945021969,
+        "significant": true,
+        "sig_either_way": true,
+        "crosses_zero": false,
+        "verdict": "a significantly better"
+      }
+    }
+  },
+  "track_intensity": {
+    "n_per_lead": {
+      "6h": 591,
+      "12h": 533,
+      "24h": 431
+    },
+    "track": {
+      "persistence_motion": {
+        "6h": {
+          "point": 32.598104846714016,
+          "lo": 29.399591048936838,
+          "hi": 36.19040710204609,
+          "n_valid_reps": 1000
+        },
+        "12h": {
+          "point": 65.98688895252535,
+          "lo": 59.14882823470849,
+          "hi": 73.96275613881339,
+          "n_valid_reps": 1000
+        },
+        "24h": {
+          "point": 144.47068036074873,
+          "lo": 128.0891862420937,
+          "hi": 167.2726511639765,
+          "n_valid_reps": 1000
+        }
+      },
+      "true_cliper": {
+        "6h": {
+          "point": 39.022385603832966,
+          "lo": 36.08940436892596,
+          "hi": 42.318334782567796,
+          "n_valid_reps": 1000
+        },
+        "12h": {
+          "point": 73.98153750207044,
+          "lo": 68.73312608991753,
+          "hi": 80.53125758580674,
+          "n_valid_reps": 1000
+        },
+        "24h": {
+          "point": 147.17870357306606,
+          "lo": 134.25505989441197,
+          "hi": 161.22284031386516,
+          "n_valid_reps": 1000
+        }
+      },
+      "gbm_direct": {
+        "6h": {
+          "point": 41.34261137184413,
+          "lo": 38.673040805574566,
+          "hi": 44.51941787053683,
+          "n_valid_reps": 1000
+        },
+        "12h": {
+          "point": 78.80334125047533,
+          "lo": 73.21096297558232,
+          "hi": 85.01838730725191,
+          "n_valid_reps": 1000
+        },
+        "24h": {
+          "point": 161.7557315808687,
+          "lo": 148.77022963955054,
+          "hi": 176.7427177986176,
+          "n_valid_reps": 1000
+        }
+      },
+      "gbm_motion_resid": {
+        "6h": {
+          "point": 40.14957801885991,
+          "lo": 37.390256018270165,
+          "hi": 43.28736303225249,
+          "n_valid_reps": 1000
+        },
+        "12h": {
+          "point": 77.71914431333046,
+          "lo": 71.60613743314363,
+          "hi": 84.40727788616331,
+          "n_valid_reps": 1000
+        },
+        "24h": {
+          "point": 152.08292580351144,
+          "lo": 136.18993428463313,
+          "hi": 169.61794072168598,
+          "n_valid_reps": 1000
+        }
+      },
+      "lstm_direct": {
+        "6h": {
+          "point": 53.207150714552526,
+          "lo": 49.4587873249869,
+          "hi": 57.19715382170416,
+          "n_valid_reps": 1000
+        },
+        "12h": {
+          "point": 104.30510128898813,
+          "lo": 93.26744476782238,
+          "hi": 115.55067641719116,
+          "n_valid_reps": 1000
+        },
+        "24h": {
+          "point": 186.1257172568869,
+          "lo": 167.5874559970324,
+          "hi": 204.98210472052804,
+          "n_valid_reps": 1000
+        }
+      },
+      "lstm_motion_resid": {
+        "6h": {
+          "point": 48.59366969169737,
+          "lo": 43.45808510046613,
+          "hi": 54.052180951663026,
+          "n_valid_reps": 1000
+        },
+        "12h": {
+          "point": 97.42191707518013,
+          "lo": 89.01335333974626,
+          "hi": 108.10297124270888,
+          "n_valid_reps": 1000
+        },
+        "24h": {
+          "point": 174.83046788223274,
+          "lo": 156.53401692995615,
+          "hi": 197.1157794990508,
+          "n_valid_reps": 1000
+        }
+      },
+      "analog": {
+        "6h": {
+          "point": 46.82035302657871,
+          "lo": 43.3832391877242,
+          "hi": 50.16502602179076,
+          "n_valid_reps": 1000
+        },
+        "12h": {
+          "point": 88.12419482795546,
+          "lo": 82.13679457026498,
+          "hi": 94.3200839797541,
+          "n_valid_reps": 1000
+        },
+        "24h": {
+          "point": 181.05614892667208,
+          "lo": 166.06108581471713,
+          "hi": 196.53831559945763,
+          "n_valid_reps": 1000
+        }
+      }
+    },
+    "intensity": {
+      "persistence": {
+        "6h": {
+          "point": 3.955160744500846,
+          "lo": 3.03279640354371,
+          "hi": 4.891863828930553,
+          "n_valid_reps": 1000
+        },
+        "12h": {
+          "point": 7.706378986866792,
+          "lo": 5.92126124419809,
+          "hi": 9.612416950551195,
+          "n_valid_reps": 1000
+        },
+        "24h": {
+          "point": 14.106728538283063,
+          "lo": 10.419670370875375,
+          "hi": 18.02354873484664,
+          "n_valid_reps": 1000
+        }
+      },
+      "gbm": {
+        "6h": {
+          "point": 4.220036370847651,
+          "lo": 3.319828341224893,
+          "hi": 5.138635516815741,
+          "n_valid_reps": 1000
+        },
+        "12h": {
+          "point": 7.601337581507276,
+          "lo": 5.641027739034169,
+          "hi": 9.448418184556814,
+          "n_valid_reps": 1000
+        },
+        "24h": {
+          "point": 13.138411965537538,
+          "lo": 9.655062529697428,
+          "hi": 16.127870248757784,
+          "n_valid_reps": 1000
+        }
+      },
+      "analog": {
+        "6h": {
+          "point": 3.8257614213197972,
+          "lo": 3.213408418504573,
+          "hi": 4.465488785326901,
+          "n_valid_reps": 1000
+        },
+        "12h": {
+          "point": 7.13707153280324,
+          "lo": 5.94361732783388,
+          "hi": 8.493656095775519,
+          "n_valid_reps": 1000
+        },
+        "24h": {
+          "point": 13.315777262180974,
+          "lo": 10.90966503136035,
+          "hi": 16.02239526651237,
+          "n_valid_reps": 1000
+        }
+      }
+    },
+    "track_paired": {
+      "true_cliper_vs_persistence_motion": {
+        "6h": {
+          "improvement": -6.42428075711895,
+          "lo": -9.154439364919963,
+          "hi": -3.9198840966121558,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        },
+        "12h": {
+          "improvement": -7.99464854954509,
+          "lo": -13.832920469497836,
+          "hi": -1.9918039932351528,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        },
+        "24h": {
+          "improvement": -2.708023212317329,
+          "lo": -17.643716529553377,
+          "hi": 12.814079391344164,
+          "significant": false,
+          "sig_either_way": false,
+          "crosses_zero": true,
+          "verdict": "tie (CI crosses 0)"
+        }
+      },
+      "gbm_direct_vs_persistence_motion": {
+        "6h": {
+          "improvement": -8.744506525130113,
+          "lo": -11.868400042823962,
+          "hi": -5.819676014732016,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        },
+        "12h": {
+          "improvement": -12.81645229794998,
+          "lo": -20.009940507400117,
+          "hi": -5.563512455599149,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        },
+        "24h": {
+          "improvement": -17.285051220119982,
+          "lo": -33.93810638494655,
+          "hi": 1.2300229389834492,
+          "significant": false,
+          "sig_either_way": false,
+          "crosses_zero": true,
+          "verdict": "tie (CI crosses 0)"
+        }
+      },
+      "gbm_motion_resid_vs_persistence_motion": {
+        "6h": {
+          "improvement": -7.551473172145897,
+          "lo": -10.50758744862689,
+          "hi": -4.91606006498154,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        },
+        "12h": {
+          "improvement": -11.732255360805112,
+          "lo": -19.843108739472658,
+          "hi": -4.315877667705482,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        },
+        "24h": {
+          "improvement": -7.612245442762713,
+          "lo": -24.825398320563625,
+          "hi": 10.22262851547193,
+          "significant": false,
+          "sig_either_way": false,
+          "crosses_zero": true,
+          "verdict": "tie (CI crosses 0)"
+        }
+      },
+      "lstm_direct_vs_persistence_motion": {
+        "6h": {
+          "improvement": -20.60904586783851,
+          "lo": -25.02244362036176,
+          "hi": -16.406623700939967,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        },
+        "12h": {
+          "improvement": -38.31821233646278,
+          "lo": -51.85281251725682,
+          "hi": -25.82387353641435,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        },
+        "24h": {
+          "improvement": -41.65503689613817,
+          "lo": -63.66710368152446,
+          "hi": -18.081481852756593,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        }
+      },
+      "lstm_motion_resid_vs_persistence_motion": {
+        "6h": {
+          "improvement": -15.995564844983356,
+          "lo": -21.55081885448558,
+          "hi": -11.001842494834717,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        },
+        "12h": {
+          "improvement": -31.435028122654785,
+          "lo": -39.68750026772036,
+          "hi": -22.752291171506233,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        },
+        "24h": {
+          "improvement": -30.35978752148401,
+          "lo": -41.707860176553815,
+          "hi": -16.300307432621427,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        }
+      },
+      "analog_vs_persistence_motion": {
+        "6h": {
+          "improvement": -14.222248179864692,
+          "lo": -17.17690647817826,
+          "hi": -11.044626979641349,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        },
+        "12h": {
+          "improvement": -22.137305875430116,
+          "lo": -29.25694515806752,
+          "hi": -15.257428779184755,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        },
+        "24h": {
+          "improvement": -36.58546856592335,
+          "lo": -55.565708513532066,
+          "hi": -15.546640200419352,
+          "significant": false,
+          "sig_either_way": true,
+          "crosses_zero": false,
+          "verdict": "a significantly WORSE"
+        }
+      },
+      "gbm_motion_resid_vs_true_cliper": {
+        "6h": {
+          "improvement": -1.127192415026947,
+          "lo": -3.2245204642191214,
+          "hi": 0.8973646667786619,
+          "significant": false,
+          "sig_either_way": false,
+          "crosses_zero": true,
+          "verdict": "tie (CI crosses 0)"
+        },
+        "12h": {
+          "improvement": -3.7376068112600223,
+          "lo": -8.555902112983972,
+          "hi": 0.8367259179315509,
+          "significant": false,
+          "sig_either_way": false,
+          "crosses_zero": true,
+          "verdict": "tie (CI crosses 0)"
+        },
+        "24h": {
+          "improvement": -4.904222230445384,
+          "lo": -13.78811244441021,
+          "hi": 4.821044178723153,
+          "significant": false,
+          "sig_either_way": false,
+          "crosses_zero": true,
+          "verdict": "tie (CI crosses 0)"
+        }
+      }
+    },
+    "intensity_paired": {
+      "gbm_vs_persistence": {
+        "6h": {
+          "improvement": -0.2648756263468046,
+          "lo": -1.2801470146154104,
+          "hi": 0.6389196310702482,
+          "significant": false,
+          "sig_either_way": false,
+          "crosses_zero": true,
+          "verdict": "tie (CI crosses 0)"
+        },
+        "12h": {
+          "improvement": 0.10504140535951567,
+          "lo": -2.1263038256619127,
+          "hi": 2.126960948154117,
+          "significant": false,
+          "sig_either_way": false,
+          "crosses_zero": true,
+          "verdict": "tie (CI crosses 0)"
+        },
+        "24h": {
+          "improvement": 0.9683165727455254,
+          "lo": -2.240464862363246,
+          "hi": 4.406349212542659,
+          "significant": false,
+          "sig_either_way": false,
+          "crosses_zero": true,
+          "verdict": "tie (CI crosses 0)"
+        }
+      },
+      "analog_vs_persistence": {
+        "6h": {
+          "improvement": 0.12939932318104885,
+          "lo": -0.2886035222723617,
+          "hi": 0.5805922252322336,
+          "significant": false,
+          "sig_either_way": false,
+          "crosses_zero": true,
+          "verdict": "tie (CI crosses 0)"
+        },
+        "12h": {
+          "improvement": 0.5693074540635514,
+          "lo": -0.3506941029534119,
+          "hi": 1.4838297630725983,
+          "significant": false,
+          "sig_either_way": false,
+          "crosses_zero": true,
+          "verdict": "tie (CI crosses 0)"
+        },
+        "24h": {
+          "improvement": 0.7909512761020885,
+          "lo": -1.4438859626571265,
+          "hi": 2.968357168752288,
+          "significant": false,
+          "sig_either_way": false,
+          "crosses_zero": true,
+          "verdict": "tie (CI crosses 0)"
+        }
+      }
+    }
+  }
+}

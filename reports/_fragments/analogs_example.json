@@ -1,0 +1,182 @@
+{
+  "query": {
+    "storm": "2022-013",
+    "name": "MANDOUS",
+    "year": 2022,
+    "lat": 8.9,
+    "lon": 85.0,
+    "wind_kt": 30.0,
+    "actual_d_wind_24h": 20.0
+  },
+  "analog_dwind_deciles": {
+    "6h": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.5
+    ],
+    "12h": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.5,
+      5.0,
+      6.0
+    ],
+    "24h": [
+      0.0,
+      0.0,
+      3.5,
+      5.0,
+      5.0,
+      5.0,
+      6.5,
+      11.0,
+      15.5
+    ]
+  },
+  "decile_pct": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90
+  ],
+  "p_ri_24h": 0.0,
+  "p_rapid_weakening_24h": 0.0,
+  "n_analogs_with_24h_outcome": 10,
+  "analogs": [
+    {
+      "storm_id": "2018-014",
+      "name": "PHETHAI",
+      "year": 2018,
+      "analog_wind_kt": 30.0,
+      "d_wind_6h": 0.0,
+      "d_wind_12h": 0.0,
+      "d_wind_24h": 5.0,
+      "disp_6h_km": 80.05,
+      "disp_24h_km": 300.93,
+      "eventual_peak_grade_ord": 3.0
+    },
+    {
+      "storm_id": "2018-014",
+      "name": "PHETHAI",
+      "year": 2018,
+      "analog_wind_kt": 30.0,
+      "d_wind_6h": 0.0,
+      "d_wind_12h": 5.0,
+      "d_wind_24h": 10.0,
+      "disp_6h_km": 62.5,
+      "disp_24h_km": 287.5,
+      "eventual_peak_grade_ord": 3.0
+    },
+    {
+      "storm_id": "2018-014",
+      "name": "PHETHAI",
+      "year": 2018,
+      "analog_wind_kt": 30.0,
+      "d_wind_6h": 0.0,
+      "d_wind_12h": 0.0,
+      "d_wind_24h": 5.0,
+      "disp_6h_km": 69.6,
+      "disp_24h_km": 281.36,
+      "eventual_peak_grade_ord": 3.0
+    },
+    {
+      "storm_id": "1993-003",
+      "name": "(unnamed)",
+      "year": 1993,
+      "analog_wind_kt": 30.0,
+      "d_wind_6h": 0.0,
+      "d_wind_12h": 15.0,
+      "d_wind_24h": 15.0,
+      "disp_6h_km": 123.29,
+      "disp_24h_km": 369.48,
+      "eventual_peak_grade_ord": 5.0
+    },
+    {
+      "storm_id": "2005-012",
+      "name": "(unnamed)",
+      "year": 2005,
+      "analog_wind_kt": 25.0,
+      "d_wind_6h": 0.0,
+      "d_wind_12h": 0.0,
+      "d_wind_24h": 5.0,
+      "disp_6h_km": 0.0,
+      "disp_24h_km": 123.29,
+      "eventual_peak_grade_ord": 1.0
+    },
+    {
+      "storm_id": "2005-012",
+      "name": "(unnamed)",
+      "year": 2005,
+      "analog_wind_kt": 25.0,
+      "d_wind_6h": 5.0,
+      "d_wind_12h": 5.0,
+      "d_wind_24h": 5.0,
+      "disp_6h_km": 0.0,
+      "disp_24h_km": 199.74,
+      "eventual_peak_grade_ord": 1.0
+    },
+    {
+      "storm_id": "1999-008",
+      "name": "(unnamed)",
+      "year": 1999,
+      "analog_wind_kt": 25.0,
+      "d_wind_6h": 0.0,
+      "d_wind_12h": 0.0,
+      "d_wind_24h": 0.0,
+      "disp_6h_km": 0.0,
+      "disp_24h_km": 122.58,
+      "eventual_peak_grade_ord": 0.0
+    },
+    {
+      "storm_id": "2005-012",
+      "name": "(unnamed)",
+      "year": 2005,
+      "analog_wind_kt": 30.0,
+      "d_wind_6h": 0.0,
+      "d_wind_12h": 0.0,
+      "d_wind_24h": 0.0,
+      "disp_6h_km": 78.17,
+      "disp_24h_km": 247.96,
+      "eventual_peak_grade_ord": 1.0
+    },
+    {
+      "storm_id": "1999-008",
+      "name": "(unnamed)",
+      "year": 1999,
+      "analog_wind_kt": 25.0,
+      "d_wind_6h": 0.0,
+      "d_wind_12h": 0.0,
+      "d_wind_24h": 0.0,
+      "disp_6h_km": 164.0,
+      "disp_24h_km": 218.67,
+      "eventual_peak_grade_ord": 0.0
+    },
+    {
+      "storm_id": "2000-006",
+      "name": "(unnamed)",
+      "year": 2000,
+      "analog_wind_kt": 30.0,
+      "d_wind_6h": 0.0,
+      "d_wind_12h": 0.0,
+      "d_wind_24h": 20.0,
+      "disp_6h_km": 27.49,
+      "disp_24h_km": 82.48,
+      "eventual_peak_grade_ord": 5.0
+    }
+  ]
+}

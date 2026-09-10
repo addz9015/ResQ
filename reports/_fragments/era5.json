@@ -1,0 +1,28 @@
+{
+  "status": "unavailable",
+  "output": "data\\cyclone_6h_with_env.parquet",
+  "n_grid_states": 4469,
+  "months_required": 223,
+  "months_fetched": [],
+  "months_failed": [],
+  "field_coverage": {
+    "shear_deep_ms": 0.0,
+    "shear_deep_ms_a200": 0.0,
+    "shear_deep_ms_a500": 0.0,
+    "shear_deep_ms_a800": 0.0,
+    "steering_z500_m": 0.0,
+    "steering_z500_m_a200": 0.0,
+    "steering_z500_m_a500": 0.0,
+    "steering_z500_m_a800": 0.0,
+    "rh600_pct": 0.0,
+    "rh600_pct_a200": 0.0,
+    "rh600_pct_a500": 0.0,
+    "rh600_pct_a800": 0.0,
+    "sst_c": 0.0,
+    "sst_c_a200": 0.0,
+    "sst_c_a500": 0.0,
+    "sst_c_a800": 0.0
+  },
+  "note": "env columns are present but NULL until CDS access is granted; no model consumes them yet - `src/era5.py` is the fetch layer only.",
+  "help": "ERA5 fetch is not available. To enable it:\n  1. pip install cdsapi xarray netcdf4\n  2. create ~/.cdsapirc with your CDS API key\n     (https://cds.climate.copernicus.eu/how-to-api)\n  3. accept the 'ERA5 hourly data on pressure/single levels' licence\nUntil then, env columns are written NULL and no model uses them."
+}

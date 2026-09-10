@@ -1,0 +1,116 @@
+{
+  "rows": [
+    {
+      "model": "GBM \u0394wind 6h",
+      "metric": "MAE kt",
+      "train": 2.3724825661610343,
+      "oof": 3.570922176888811,
+      "test": 4.220036370847651,
+      "overfit_gap_oof_minus_train_pct": 50.5,
+      "flag": "OVERFIT"
+    },
+    {
+      "model": "GBM \u0394wind 12h",
+      "metric": "MAE kt",
+      "train": 3.4758128107780477,
+      "oof": 6.140716180770783,
+      "test": 7.601337581507276,
+      "overfit_gap_oof_minus_train_pct": 76.7,
+      "flag": "OVERFIT"
+    },
+    {
+      "model": "GBM \u0394wind 24h",
+      "metric": "MAE kt",
+      "train": 4.730008123876168,
+      "oof": 10.628310365955832,
+      "test": 13.138411965537538,
+      "overfit_gap_oof_minus_train_pct": 124.7,
+      "flag": "OVERFIT"
+    },
+    {
+      "model": "GBM track-residual 6h",
+      "metric": "gc err km",
+      "train": 38.111051025912474,
+      "oof": 58.32531965504213,
+      "test": 40.14957801885991,
+      "overfit_gap_oof_minus_train_pct": 53.0,
+      "flag": "OVERFIT"
+    },
+    {
+      "model": "GBM track-residual 12h",
+      "metric": "gc err km",
+      "train": 58.29977888806289,
+      "oof": 105.31959287540579,
+      "test": 77.71914431333046,
+      "overfit_gap_oof_minus_train_pct": 80.7,
+      "flag": "OVERFIT"
+    },
+    {
+      "model": "GBM track-residual 24h",
+      "metric": "gc err km",
+      "train": 92.35518334825287,
+      "oof": 188.29831579015038,
+      "test": 152.08292580351144,
+      "overfit_gap_oof_minus_train_pct": 103.9,
+      "flag": "OVERFIT"
+    },
+    {
+      "model": "true CLIPER 6h",
+      "metric": "gc err km",
+      "train": 55.58328957845065,
+      "oof": 56.24595121851112,
+      "test": 39.022385603832966,
+      "overfit_gap_oof_minus_train_pct": 1.2,
+      "flag": "ok"
+    },
+    {
+      "model": "true CLIPER 12h",
+      "metric": "gc err km",
+      "train": 98.57137193867266,
+      "oof": 100.02241270053712,
+      "test": 73.98153750207044,
+      "overfit_gap_oof_minus_train_pct": 1.5,
+      "flag": "ok"
+    },
+    {
+      "model": "true CLIPER 24h",
+      "metric": "gc err km",
+      "train": 179.8419985144891,
+      "oof": 184.0493767792028,
+      "test": 147.17870357306606,
+      "overfit_gap_oof_minus_train_pct": 2.3,
+      "flag": "ok"
+    },
+    {
+      "model": "RI classifier (HGB)",
+      "metric": "PR-AUC",
+      "train": 0.929813607576534,
+      "oof": 0.15494968377715204,
+      "test": 0.21891568964442254,
+      "overfit_gap_train_minus_oof": 0.7749,
+      "flag": "OVERFIT"
+    },
+    {
+      "model": "RI analog P(RI), k=10",
+      "metric": "PR-AUC",
+      "train": 0.09295151371193432,
+      "oof": 0.10469436404268383,
+      "test": 0.23431394702383504,
+      "overfit_gap_train_minus_oof": -0.0117,
+      "flag": "ok"
+    }
+  ],
+  "lstm": {
+    "model": "LSTM (track + \u0394wind)",
+    "note": "not retrained in phase 6 \u2014 frozen test numbers only (results.md \u00a71: 53/104/186 km track, 4.7/9.4/16.6 kt \u0394wind). Its test error is *worse* than the trivial baselines, which rules out train-memorisation as the failure mode \u2014 a model that overfit would at least fit its own training data."
+  },
+  "overfitting_summary": [
+    "GBM \u0394wind 6h",
+    "GBM \u0394wind 12h",
+    "GBM \u0394wind 24h",
+    "GBM track-residual 6h",
+    "GBM track-residual 12h",
+    "GBM track-residual 24h",
+    "RI classifier (HGB)"
+  ]
+}

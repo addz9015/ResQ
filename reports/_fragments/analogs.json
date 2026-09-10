@@ -1,0 +1,95 @@
+{
+  "library_states": 2368,
+  "holdout_states_scored": 1095,
+  "table": [
+    {
+      "model": "persistence (dwind=0, no motion)",
+      "6h": {
+        "n": 1019,
+        "track_km_mean": 75.71336685880586,
+        "track_km_median": 70.47491372924095,
+        "dwind_MAE_kt": 3.2654563297350343,
+        "dwind_RMSE_kt": 5.720436556363223
+      },
+      "12h": {
+        "n": 943,
+        "track_km_mean": 148.64298866870007,
+        "track_km_median": 143.21611471086126,
+        "dwind_MAE_kt": 6.434252386002121,
+        "dwind_RMSE_kt": 10.288527874320355
+      },
+      "24h": {
+        "n": 791,
+        "track_km_mean": 286.4023514607996,
+        "track_km_median": 280.09644809035206,
+        "dwind_MAE_kt": 12.195533080488834,
+        "dwind_RMSE_kt": 18.12198601975464
+      }
+    },
+    {
+      "model": "CLIPER (extrapolate 6h motion)",
+      "6h": {
+        "n": 1019,
+        "track_km_mean": 33.728815558703154,
+        "track_km_median": 24.691678523973373,
+        "dwind_MAE_kt": 3.2654563297350343,
+        "dwind_RMSE_kt": 5.720436556363223
+      },
+      "12h": {
+        "n": 943,
+        "track_km_mean": 70.50214900180592,
+        "track_km_median": 56.961494272604476,
+        "dwind_MAE_kt": 6.434252386002121,
+        "dwind_RMSE_kt": 10.288527874320355
+      },
+      "24h": {
+        "n": 791,
+        "track_km_mean": 155.442196051231,
+        "track_km_median": 131.39662105358767,
+        "dwind_MAE_kt": 12.195533080488834,
+        "dwind_RMSE_kt": 18.12198601975464
+      }
+    },
+    {
+      "model": "analog-ensemble mean (k=10, euclidean)",
+      "6h": {
+        "n": 1019,
+        "track_km_mean": 45.36395648863447,
+        "track_km_median": 39.661399071050404,
+        "dwind_MAE_kt": 3.2559371933267913,
+        "dwind_RMSE_kt": 4.95503531911024
+      },
+      "12h": {
+        "n": 943,
+        "track_km_mean": 86.98946812890067,
+        "track_km_median": 76.34070507835003,
+        "dwind_MAE_kt": 5.988518434356187,
+        "dwind_RMSE_kt": 8.837636433081572
+      },
+      "24h": {
+        "n": 791,
+        "track_km_mean": 177.4296020265122,
+        "track_km_median": 161.33950929990712,
+        "dwind_MAE_kt": 11.200651342149444,
+        "dwind_RMSE_kt": 16.061203487306415
+      }
+    }
+  ],
+  "analog_beats_baseline": {
+    "6h": {
+      "track_vs_CLIPER": false,
+      "track_vs_persistence": true,
+      "dwind_vs_persistence": true
+    },
+    "12h": {
+      "track_vs_CLIPER": false,
+      "track_vs_persistence": true,
+      "dwind_vs_persistence": true
+    },
+    "24h": {
+      "track_vs_CLIPER": false,
+      "track_vs_persistence": true,
+      "dwind_vs_persistence": true
+    }
+  }
+}

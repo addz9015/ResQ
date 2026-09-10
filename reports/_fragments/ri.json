@@ -1,0 +1,76 @@
+{
+  "target": "wind(t+24h) - wind(t) >= 30 kt",
+  "split": "pre-2019 GroupKFold K=10 for fit/calibration; test = 2019+",
+  "n": {
+    "pre2019": 1781,
+    "test": 791
+  },
+  "train_base_rate": 0.058955642897248736,
+  "test_base_rate": 0.0606826801517067,
+  "pr_auc_baseline": 0.0606826801517067,
+  "climatology_brier": 0.057003275138990644,
+  "analog_p_ri_calibrated": {
+    "roc_auc": 0.7874607447285777,
+    "pr_auc": 0.18682168904846794,
+    "brier": 0.053157609971270926,
+    "n": 791
+  },
+  "ri_classifier_calibrated": {
+    "roc_auc": 0.7964053387169135,
+    "pr_auc": 0.18938564291902782,
+    "brier": 0.05259365927835606,
+    "n": 791
+  },
+  "average": {
+    "roc_auc": 0.8423620457604307,
+    "pr_auc": 0.2467939561335586,
+    "brier": 0.052234124068895264,
+    "n": 791
+  },
+  "logistic_stack": {
+    "roc_auc": 0.8241644235082997,
+    "pr_auc": 0.2305957387975759,
+    "brier": 0.05630450540750319,
+    "n": 791
+  },
+  "stack_coefficients": {
+    "analog": 0.5439852496155237,
+    "classifier": 2.6430724877253393,
+    "intercept": -3.2809079180118514
+  },
+  "winner_pr_auc": "average",
+  "winner_brier": "average",
+  "combination_helps": true,
+  "winner_reliability_5bin": [
+    {
+      "bin": "0.0-0.2",
+      "n": 788,
+      "mean_pred": 0.05404042847556579,
+      "empirical": 0.05964467005076142
+    },
+    {
+      "bin": "0.2-0.4",
+      "n": 3,
+      "mean_pred": 0.21867555921492088,
+      "empirical": 0.3333333333333333
+    },
+    {
+      "bin": "0.4-0.6",
+      "n": 0,
+      "mean_pred": null,
+      "empirical": null
+    },
+    {
+      "bin": "0.6-0.8",
+      "n": 0,
+      "mean_pred": null,
+      "empirical": null
+    },
+    {
+      "bin": "0.8-1.0",
+      "n": 0,
+      "mean_pred": null,
+      "empirical": null
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "definition": "RI = wind(t+24h) - wind(t) >= 30 kt on the 6 h grid",
+  "split": "library = pre-2019 storms; scored on 2019+ test storms",
+  "n_test": 791,
+  "test_base_rate": 0.0606826801517067,
+  "train_climatology_base_rate": 0.044341216216216214,
+  "analog_p_ri": {
+    "brier": 0.05396197207402884,
+    "reliability_5bin": [
+      {
+        "bin": "0.0-0.2",
+        "n": 656,
+        "mean_pred": 0.020154616724738676,
+        "empirical": 0.028963414634146343
+      },
+      {
+        "bin": "0.2-0.4",
+        "n": 117,
+        "mean_pred": 0.26784018450685115,
+        "empirical": 0.20512820512820512
+      },
+      {
+        "bin": "0.4-0.6",
+        "n": 17,
+        "mean_pred": 0.4662931839402428,
+        "empirical": 0.23529411764705882
+      },
+      {
+        "bin": "0.6-0.8",
+        "n": 1,
+        "mean_pred": 0.625,
+        "empirical": 1.0
+      }
+    ]
+  },
+  "climatology_forecast": {
+    "brier": 0.0572673359248673
+  },
+  "analog_beats_climatology": true
+}
