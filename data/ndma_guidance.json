@@ -1,0 +1,468 @@
+{
+  "status": "ok",
+  "_source_mode": "fetched",
+  "source": "NDMA \u2014 National Disaster Management Authority (ndma.gov.in)",
+  "retrieved_on": "2026-09-10",
+  "n_items": 51,
+  "items": [
+    {
+      "id": "ndma-01",
+      "text": "Check the house; secure loose tiles and carry out repairs of doors and windows",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-02",
+      "text": "Remove dead branches or dying trees close to the house; anchor removable objects such as lumber piles, loose tin sheets, loose bricks, garbage cans, sign-boards etc. which can fly in strong winds",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-03",
+      "text": "Keep some wooden boards ready so that glass windows can be boarded if needed",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-04",
+      "text": "Keep a hurricane lantern filled with kerosene, battery operated torches and enough dry cells",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-05",
+      "text": "Demolish condemned buildings",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-06",
+      "text": "Keep some extra batteries for transistors",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-07",
+      "text": "Keep some dry non-perishable food always ready for use in emergency",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-08",
+      "text": "Listen to the radio (All India Radio stations give weather warnings).",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-09",
+      "text": "Keep monitoring the warnings. This will help you prepare for a cyclone emergency.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-10",
+      "text": "Pass the information to others.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-11",
+      "text": "Ignore rumours and do not spread them; this will help to avoid panic situations.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-12",
+      "text": "Believe in the official information",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-13",
+      "text": "When a cyclone alert is on for your area continue normal working but stay alert to the radio warnings.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-14",
+      "text": "Stay alert for the next 24 hours as a cyclone alert means that the danger is within 24 hours.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-15",
+      "text": "Leave early before your way to high ground or shelter gets flooded",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-16",
+      "text": "Do not delay and run the risk of being marooned",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": true
+    },
+    {
+      "id": "ndma-17",
+      "text": "If your house is securely built on high ground take shelter in the safe part of the house. However, if asked to evacuate do not hesitate to leave the place.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-18",
+      "text": "Board up glass windows or put storm shutters in place.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-19",
+      "text": "Provide strong suitable support for outside doors.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-20",
+      "text": "If you do not have wooden boards handy, paste paper strips on glasses to prevent splinters. However, this may not avoid breaking windows.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-21",
+      "text": "Get extra food, which can be eaten without cooking. Store extra drinking water in suitably covered vessels.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-22",
+      "text": "If you have to evacuate the house move your valuable articles to upper floors to minimize flood damage.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-23",
+      "text": "Ensure that your hurricane lantern, torches or other emergency lights are in working condition and keep them handy.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-24",
+      "text": "Small and loose things, which can fly in strong winds, should be stored safely in a room.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-25",
+      "text": "Be sure that a window and door can be opened only on the side opposite to the one facing the wind.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-26",
+      "text": "Make provision for children and adults requiring special diet.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-27",
+      "text": "If the centre of the cyclone is passing directly over your house there will be a lull in the wind and rain lasting for half an hour or so. During this time do not go out; because immediately after that, very strong winds will blow from the opposite direction.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-28",
+      "text": "Switch off the electrical mains in your house.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-29",
+      "text": "Remain calm.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-30",
+      "text": "DO NOT venture out even when the winds appear to calm down. The 'eye' of the cyclone might be passing. Winds might intensify and gush again and cause damage. Be safe inside till it is officially announced that the cyclone has passed.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "final12",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-31",
+      "text": "Pack essentials for yourself and your family to last a few days. These should include medicines, special food for babies and children or elders.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-32",
+      "text": "Head for the proper shelter or evacuation points indicated for your area.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-33",
+      "text": "Do not worry about your property",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-34",
+      "text": "At the shelter follow instructions of the person in charge.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-35",
+      "text": "Remain in the shelter until you are informed to leave",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "next24",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-36",
+      "text": "You should remain in the shelter until informed that you can return to your home.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "after",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-37",
+      "text": "You must get inoculated against diseases immediately.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "after",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-38",
+      "text": "Strictly avoid any loose and dangling wires from lamp posts.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "after",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-39",
+      "text": "If you have to drive, do drive carefully.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "after",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-40",
+      "text": "Clear debris from your premises immediately.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "after",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-41",
+      "text": "Report the correct losses to appropriate authorities.",
+      "source_name": "NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "2026-09-10",
+      "time_band": "after",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-42",
+      "text": "Battery operated torch",
+      "source_name": "NDMA \u2014 Cyclone",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-43",
+      "text": "Extra batteries",
+      "source_name": "NDMA \u2014 Cyclone",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-44",
+      "text": "Battery operated radio",
+      "source_name": "NDMA \u2014 Cyclone",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-45",
+      "text": "First aid kit and essential medicines",
+      "source_name": "NDMA \u2014 Cyclone",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-46",
+      "text": "Important papers (Ration card, Voter ID card, Aadhar card etc)",
+      "source_name": "NDMA \u2014 Cyclone",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-47",
+      "text": "Emergency food (dry items) and water (packed and sealed)",
+      "source_name": "NDMA \u2014 Cyclone",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-48",
+      "text": "Candles and matches in a waterproof container",
+      "source_name": "NDMA \u2014 Cyclone",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-49",
+      "text": "Chlorine tablets or powdered water purifiers",
+      "source_name": "NDMA \u2014 Cyclone",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-50",
+      "text": "Cash, Aadhar Card and Ration Card",
+      "source_name": "NDMA \u2014 Cyclone",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    },
+    {
+      "id": "ndma-51",
+      "text": "Thick ropes and cords",
+      "source_name": "NDMA \u2014 Cyclone",
+      "source_url": "https://ndma.gov.in/Natural-Hazards/Cyclone",
+      "retrieved_on": "2026-09-10",
+      "time_band": "now",
+      "_coastal_only": false
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "status": "ok",
+  "source_note": "Every item below MUST be transcribed verbatim from a named published source. Do not paraphrase. Do not add items from memory.",
+  "items": [
+    {
+      "id": "ndma-01",
+      "text": "EXAMPLE \u2014 REPLACE: <the exact sentence from the source>",
+      "source_name": "EXAMPLE \u2014 REPLACE: NDMA \u2014 Cyclone: Do's & Don'ts",
+      "source_url": "EXAMPLE \u2014 REPLACE: https://ndma.gov.in/Natural-Hazards/Cyclone/Dos-Donts",
+      "retrieved_on": "EXAMPLE \u2014 REPLACE: 2026-01-01",
+      "time_band": "now | next24 | final12 | after",
+      "_coastal_only": false
+    }
+  ]
+}

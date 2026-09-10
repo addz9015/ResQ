@@ -1,0 +1,106 @@
+{
+  "note": "Maps (expected intensity, hours-to-arrival, location) onto NDMA guidance item ids. Contains no advice text. Every id here must exist in ndma_guidance.json or it is not rendered.",
+  "intensity_order": [
+    "D",
+    "DD",
+    "CS",
+    "SCS",
+    "VSCS",
+    "ESCS"
+  ],
+  "hours_to_band": {
+    "72": "now",
+    "48": "now",
+    "24": "next24",
+    "12": "final12",
+    "6": "final12"
+  },
+  "bands_cumulative": {
+    "now": [
+      "now"
+    ],
+    "next24": [
+      "now",
+      "next24"
+    ],
+    "final12": [
+      "now",
+      "next24",
+      "final12"
+    ]
+  },
+  "time_bands": {
+    "now": "Now",
+    "next24": "Next 24 hours",
+    "final12": "Final 12 hours"
+  },
+  "map": {
+    "by_band": {
+      "now": [
+        "ndma-01",
+        "ndma-02",
+        "ndma-03",
+        "ndma-04",
+        "ndma-05",
+        "ndma-06",
+        "ndma-07",
+        "ndma-08",
+        "ndma-09",
+        "ndma-10",
+        "ndma-11",
+        "ndma-12",
+        "ndma-13",
+        "ndma-14",
+        "ndma-42",
+        "ndma-43",
+        "ndma-44",
+        "ndma-45",
+        "ndma-46",
+        "ndma-47",
+        "ndma-48",
+        "ndma-49",
+        "ndma-50",
+        "ndma-51"
+      ],
+      "next24": [
+        "ndma-15",
+        "ndma-16",
+        "ndma-17",
+        "ndma-18",
+        "ndma-19",
+        "ndma-20",
+        "ndma-21",
+        "ndma-22",
+        "ndma-23",
+        "ndma-24",
+        "ndma-25",
+        "ndma-26",
+        "ndma-27",
+        "ndma-28",
+        "ndma-29",
+        "ndma-31",
+        "ndma-32",
+        "ndma-33",
+        "ndma-34",
+        "ndma-35"
+      ],
+      "final12": [
+        "ndma-30"
+      ],
+      "after": [
+        "ndma-36",
+        "ndma-37",
+        "ndma-38",
+        "ndma-39",
+        "ndma-40",
+        "ndma-41"
+      ]
+    },
+    "coastal_only": [
+      "ndma-16"
+    ],
+    "min_intensity": "D",
+    "min_intensity_note": "NDMA's cyclone do's & don'ts do not vary by storm category, so every item applies from Depression upward; the intensity input is surfaced for context and future per-item tuning via item_overrides."
+  },
+  "item_overrides": {}
+}
