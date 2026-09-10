@@ -1,0 +1,45 @@
+SAMPLE / TEST FIXTURE — not an archived IMD record. Used only to exercise
+src/imd_bulletin.py parse_text(). Structure mirrors an IMD RSMC New Delhi
+Tropical Cyclone bulletin; the wording below is illustrative.
+
+INDIA METEOROLOGICAL DEPARTMENT
+TROPICAL CYCLONE ADVISORY BULLETIN NO. 15
+BASED ON 0300 UTC OF 09.12.2022
+
+SUB: Cyclonic Storm 'MANDOUS' (pronounced as Man-Dous) over southwest Bay of
+Bengal, about 250 km east-southeast of Puducherry.
+
+The Cyclonic Storm 'MANDOUS' over southwest Bay of Bengal moved
+west-northwestwards with a speed of 12 kmph during the past 6 hours and lay
+centered at 0300 UTC of 09th December 2022 near latitude 11.5 N and longitude
+82.0 E, about 250 km east-southeast of Puducherry and 300 km south-southeast of
+Chennai. The estimated central pressure is 998 hPa. Maximum sustained wind speed
+of 65-75 kmph gusting to 85 kmph is prevailing around the system centre.
+
+It is very likely to move west-northwestwards and cross north Tamil Nadu,
+Puducherry and adjoining south Andhra Pradesh coasts between Puducherry and
+Sriharikota around midnight of 9th December as a Cyclonic Storm.
+
+Forecast track and intensity:
+Date/Time(UTC)   Position (Lat/Lon)   Max wind (kmph)
+09-12/0300        11.5/82.0            70
+09-12/1200        12.0/80.7            65
+10-12/0000        13.3/79.9            45
+10-12/1200        14.1/79.0            25
+
+Warnings:
+(i) Heavy rainfall warning: Light to moderate rainfall at most places with heavy
+    to very heavy falls at isolated places likely over Tamil Nadu.
+(ii) Wind warning: Gale wind speed reaching 65-75 kmph gusting to 85 kmph likely
+     along and off north Tamil Nadu and Puducherry coasts.
+(iii) Sea condition: Rough to very rough.
+(iv) Storm surge warning: Storm surge of about 0.5 m above astronomical tide
+     likely to inundate low-lying areas.
+
+An ORANGE message (be prepared) is in force for Chennai, Tiruvallur,
+Chengalpattu, Kancheepuram and Villupuram districts of Tamil Nadu, valid till
+1730 hours IST of 9th December 2022.
+A YELLOW warning is in force for Cuddalore and Nagapattinam districts.
+
+Fishermen are advised not to venture into the southwest and adjoining southeast
+Bay of Bengal.
